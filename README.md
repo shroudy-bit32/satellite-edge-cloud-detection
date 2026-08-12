@@ -93,7 +93,7 @@ Decision threshold tuned under **High-Precision Constraint ($\ge 0.995$)** on am
 └── README.md               # Main documentation
 ```
 
-Note: Frozen .onnx and .pt model weights are packaged into releases.zip under the Releases section to keep the main repository lightweight.
+Note: Frozen .onnx and .pt model weights are packaged into v*.zip under the Releases section to keep the main repository lightweight.
 
 ## Quick Start & Execution
 Install Dependencies
