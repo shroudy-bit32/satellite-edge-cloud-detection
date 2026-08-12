@@ -1,0 +1,48 @@
+{
+  "tag": "c9_tuned",
+  "model": "mobilenetv2_100",
+  "epochs": 15,
+  "hyperparameters": {
+    "lr": 0.00119,
+    "weight_decay": 5.7e-05,
+    "batch_size": 64,
+    "label_smoothing": 0.1,
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B8A",
+      "B09",
+      "B10",
+      "B11",
+      "B12"
+    ]
+  },
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": true,
+    "ema_decay": 0.99,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.96843853820598,
+  "threshold": 0.5867888927459717,
+  "threshold_tuning": {
+    "threshold": 0.5867888927459717,
+    "precision": 0.9914383561643836,
+    "recall": 0.9476268412438625,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.9333333333333333,
+    "precision": 0.9455909943714822,
+    "recall": 0.935064935064935,
+    "f1": 0.9402985074626866,
+    "roc_auc": 0.9743388610032655,
+    "ap": 0.9817990426415901
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\c9_tuned_best.pt"
+}

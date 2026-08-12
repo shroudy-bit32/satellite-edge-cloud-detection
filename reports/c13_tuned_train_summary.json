@@ -1,0 +1,52 @@
+{
+  "tag": "c13_tuned",
+  "model": "mobilenetv2_100",
+  "epochs": 15,
+  "hyperparameters": {
+    "lr": 0.00119,
+    "weight_decay": 5.7e-05,
+    "batch_size": 64,
+    "label_smoothing": 0.1,
+    "bands": [
+      "B01",
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B09",
+      "B10",
+      "B11",
+      "B12"
+    ]
+  },
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": true,
+    "ema_decay": 0.99,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.9667221297836939,
+  "threshold": 0.6869978904724121,
+  "threshold_tuning": {
+    "threshold": 0.6869978904724121,
+    "precision": 0.9928057553956835,
+    "recall": 0.9034369885433715,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.915625,
+    "precision": 0.9543650793650794,
+    "recall": 0.8923933209647495,
+    "f1": 0.9223394055608821,
+    "roc_auc": 0.9700047153389535,
+    "ap": 0.9772224655829297
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\c13_tuned_best.pt"
+}
