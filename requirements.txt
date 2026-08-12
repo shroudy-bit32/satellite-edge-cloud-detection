@@ -1,0 +1,38 @@
+# PyTorch BU DOSYADA YOK — ayrı index'ten kurulur (zaten kurulu):
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+
+# --- Çekirdek ---
+numpy
+scipy
+pandas
+matplotlib
+tqdm
+pyyaml
+
+# --- Uydu görüntüsü G/Ç ---
+rasterio          # GeoTIFF okuma (GDAL wheel içinde gelir, ayrıca kurma)
+tifffile
+pillow
+opencv-python-headless   # albumentations bunu istiyor; GUI'li opencv-python ile birlikte kurma (cv2 cakisir)
+
+# --- Model / metrik ---
+timm              # MobileNetV3/V4 omurgaları
+torchmetrics
+scikit-learn      # precision / recall / F1 / confusion matrix
+albumentations    # veri artırma
+
+# --- Deney takibi ---
+tensorboard
+
+# --- Küçültme ve CPU çıkarım ölçümü ---
+onnx
+onnxscript        # torch>=2.9 onnx.export bunu istiyor
+onnxruntime       # DİKKAT: onnxruntime-gpu KURMA, CPU süre ölçümünü bozar
+
+# --- Demo ve ısı haritası ---
+gradio
+grad-cam          # import adı: pytorch_grad_cam
+
+# --- Veri indirme ---
+kaggle            # 95-Cloud veri seti
+requests          # Zenodo (Sentinel-2 Cloud Mask Catalogue)
