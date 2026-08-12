@@ -91,6 +91,7 @@ Decision threshold tuned under **High-Precision Constraint ($\ge 0.995$)** on am
 ├── requirements.txt        # Package dependencies
 ├── smoke_test.py           # Quick verification script
 └── README.md               # Main documentation
+```
 
 Note: Frozen .onnx and .pt model weights are packaged into releases.zip under the Releases section to keep the main repository lightweight.
 
