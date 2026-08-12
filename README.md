@@ -170,7 +170,7 @@ Thread sayısı sabitlenmezse ölçüm makinenin çekirdek sayısına göre değ
 | F1 | 0.9605 | 0.9605 | 0.9598 |
 | ROC-AUC | 0.9883 | — | — |
 | ms / kare (256²) | — | 9.77 | **5.76** |
-| ms / sahne (16 kare) | — | 156 | **92** |
+| ms / sahne (16 kare, türetilmiş) | — | ~156 | **92** |
 
 INT8 doğruluk kaybı 0.001 — pratikte bedelsiz 3.3× küçülme.
 
@@ -185,8 +185,14 @@ INT8 doğruluk kaybı 0.001 — pratikte bedelsiz 3.3× küçülme.
 | Recall | 0.9150 | 0.9140 | 0.8993 |
 | Piksel doğruluğu | 0.9412 | — | — |
 | Görüntü-seviyesi doğruluk | 0.9480 | — | — |
-| ms / kare (64²) | — | 1.04 | **0.685** |
-| ms / sahne (256 kare) | — | 265 | **175** |
+| ms / kare (64²) | — | 1.04 | **0.72** |
+| ms / sahne (256 kare, türetilmiş) | — | ~265 | ~185 |
+
+> Süreler `benchmark.py`'nin kare başına ölçümüdür; sahne başına değerler kare
+> sayısıyla çarpılarak türetilmiştir. Kareleme çalışmasında (bölüm 4.3) süreler
+> üç model için döngüsel olarak yeniden ölçüldü ve INT8 için **0.685 ms/kare →
+> 175 ms/sahne** bulundu. Bölüm 4.3'teki değerler, ölçüm koşulları eşitlendiği
+> için sürümler arası karşılaştırmada esas alınmalıdır.
 
 ### 4.3 Kareleme çalışması
 
@@ -397,13 +403,18 @@ Ayrı ölçülen değerlerin toplamı 36.9 MB, birlikte ölçülen 27.78 MB — 
 ~9 MB paylaşılan çalışma zamanı tabanıdır.
 
 **Gerçek bellek ihtiyacı disk boyutunun 10–25 katıdır.** INT8 sınıflandırıcı
-diskte 2.59 MB, çalışırken 22.12 MB. Yalnızca dosya boyutuna bakarak bellek kısıtı
+diskte 2.59 MB, çalışırken 22.1 MB. Yalnızca dosya boyutuna bakarak bellek kısıtı
 değerlendirmek yanıltıcı olur.
 
 **U-Net diskte küçük, bellekte pahalıdır.** 256² girdide sınıflandırıcıdan diskte
-2.7 kat küçük ama bellekte %22 daha pahalı — segmentasyon decoder'ı tam
-çözünürlükte ara tensörler taşır, sınıflandırıcı ise havuzlama ile hızla küçülür.
-64×64 karelemenin asıl kazancı burada: bu dezavantajı tersine çeviriyor.
+2.7 kat küçük ama bellekte yaklaşık %20 daha pahalı (26.7 MB vs 22.1 MB) —
+segmentasyon decoder'ı tam çözünürlükte ara tensörler taşır, sınıflandırıcı ise
+havuzlama ile hızla küçülür. 64×64 karelemenin asıl kazancı burada: bu
+dezavantajı tersine çeviriyor.
+
+> Bellek ölçümleri koşudan koşuya ±0.2 MB oynuyor (sınıflandırıcı için 22.12 ve
+> 22.14 MB olarak iki kez ölçüldü). Bu düzeydeki farklar anlamlı değildir;
+> yukarıdaki değerler bir ondalığa yuvarlanmıştır.
 
 > **Çekince:** ölçülen bellek ONNX Runtime'ın önceden ayırdığı havuzu içerir ve
 > ~10.5 MB'ı hiçbir ayarla düşmeyen ORT tabanıdır (arena ve bellek deseni kapatma
