@@ -24,8 +24,14 @@ yürütülmüştür; hedef donanım üzerinde çalıştırma kapsam dışıdır.
 | Süre (sahne) | 92 ms | 175 ms |
 | Ne üretir | Tek karar (indir / ele) | Piksel maskesi + bulut oranı |
 
-**Birlikte çalıştırıldığında tepe bellek 27.78 MB** — ONNX Runtime tabanını
-paylaştıkları için ayrı ölçümlerin toplamı olan 36.9 MB'den düşük.
+**Önerilen dağıtım: yalnız U-Net (v3.2).** 0.96 MB disk, 14.75 MB tepe bellek,
+175 ms/sahne. Karar kalitesi sınıflandırıcıyla başa baş (%2.38 yanlış eleme vs
+%3.09), üstelik piksel maskesi de üretiyor.
+
+İkili sınıflandırıcı, proje yönergesinde **temel hedef** olarak zorunlu
+tutulduğu için birlikte teslim edilmiştir. İkisi aynı süreçte yüklendiğinde tepe
+bellek 27.78 MB olur (ayrı ölçümlerin toplamı 36.9 MB; aradaki ~9 MB paylaşılan
+ONNX Runtime tabanı). Gerçek bir misyonda yalnız U-Net yeterlidir — bkz. bölüm 6.
 
 Downlink kazancı: **%48.65 azalma, %0.475 kullanılabilir veri kaybı**
 (seçilen çalışma noktasında; bkz. bölüm 5).
@@ -357,6 +363,46 @@ hesaba katılarak ölçülmelidir. Gelecek çalışma olarak bırakılmıştır.
 
 ---
 
+## 6.1 Dağıtım önerisi: yalnız U-Net
+
+Ölçümler tek başına U-Net'in yeterli olduğunu gösteriyor:
+
+| | Yalnız U-Net | Yalnız sınıflandırıcı | İkisi birlikte |
+|---|---|---|---|
+| Disk | **0.96 MB** | 2.59 MB | 3.55 MB |
+| Tepe bellek | **14.75 MB** | 22.14 MB | 27.78 MB |
+| Süre / sahne | 175 ms | 92 ms | 267 ms |
+| Yanlış eleme (dengeli nokta) | **%2.38** | %3.09 | — |
+| Piksel maskesi | ✓ | ✗ | ✓ |
+
+U-Net her boyut ekseninde daha ucuz, dengeli çalışma noktasında daha az
+kullanılabilir veri kaybettiriyor ve kısmi indirmeye açılan tek çıktı biçimini
+üretiyor. İkili sınıflandırıcı diskte daha büyük, çünkü MobileNetV2'nin 1280
+boyutlu sınıflandırma başlığını taşıyor; U-Net'te o kısım yok.
+
+**İkisi neden birlikte teslim edildi:** proje yönergesi ikili sınıflandırıcıyı
+temel hedef olarak zorunlu kılıyor. Bu bir mühendislik tercihi değil, kapsam
+kısıtıdır.
+
+**Kademeli kurgu (sınıflandırıcı ön süzgeç, U-Net kalanlara) neden tercih
+edilmedi:** sınıflandırıcının kendisi 92 ms tükettiği için kazandırdığı süreyi
+geri alıyor. En iyi durumda %20 hız kazancına karşılık bellek 1.9 kat büyüyor.
+
+**Tek modele geçiş için eksik iki ölçüm:**
+
+1. **U-Net'in yüksek-precision davranışı.** Seçilen çalışma noktasında
+   (precision ≥ 0.995) sınıflandırıcı %0.475 kayıpla çalışıyor; U-Net'in ölçülen
+   en yakın noktası %0.79 kayıp ve recall 0.7772. U-Net için eşik taraması bu
+   bölgede yapılmadı.
+2. **U-Net'in SPARCS performansı.** Harici doğrulama yalnızca sınıflandırıcıya
+   uygulandı. Segmentasyonun yerel karar verdiği için daha iyi genellemesi
+   beklenir (bkz. 4.4), ancak bu sınanmamış bir varsayımdır.
+
+Bu iki ölçüm tamamlanana kadar `clf256 + unet64` muhafazakâr alternatif olarak
+korunmaktadır.
+
+---
+
 ## 7. Harici doğrulama (Landsat-8 / SPARCS)
 
 Farklı sensör, eğitimde hiç görülmemiş veri, eşik yeniden ayarlanmadı.
@@ -394,9 +440,9 @@ Disk boyutu, uydu üzerindeki bellek ihtiyacının küçük bir parçasıdır. H
 
 | Senaryo | Tepe bellek |
 |---|---|
+| **ÖNERİLEN: yalnız U-Net (64²)** | **14.75 MB** |
 | Yalnız sınıflandırıcı (256²) | 22.14 MB |
-| Yalnız U-Net (64²) | 14.75 MB |
-| **Önerilen: clf256 + unet64** | **27.78 MB** |
+| Yönerge gereği teslim edilen: clf256 + unet64 | 27.78 MB |
 | Alternatif: clf64 + unet64 | 20.83 MB |
 
 Ayrı ölçülen değerlerin toplamı 36.9 MB, birlikte ölçülen 27.78 MB — aradaki
