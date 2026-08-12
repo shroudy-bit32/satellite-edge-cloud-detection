@@ -1,0 +1,45 @@
+{
+  "tag": "distilled_teacher",
+  "model": "mobilenetv2_140",
+  "epochs": 15,
+  "hyperparameters": {
+    "lr": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size": 64,
+    "label_smoothing": 0.0,
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B10",
+      "B11"
+    ]
+  },
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": true,
+    "ema_decay": 0.99,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.9508474576271186,
+  "threshold": 0.7558473944664001,
+  "threshold_tuning": {
+    "threshold": 0.7558473944664001,
+    "precision": 0.9909420289855072,
+    "recall": 0.8952536824877251,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.9395833333333333,
+    "precision": 0.9819639278557114,
+    "recall": 0.9090909090909091,
+    "f1": 0.9441233140655106,
+    "roc_auc": 0.9808213503496843,
+    "ap": 0.987496261152571
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\distilled_teacher_best.pt"
+}

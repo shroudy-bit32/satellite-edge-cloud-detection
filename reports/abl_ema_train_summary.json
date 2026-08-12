@@ -1,0 +1,31 @@
+{
+  "tag": "abl_ema",
+  "model": "mobilenetv3_small_100",
+  "epochs": 15,
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": true,
+    "ema_decay": 0.999,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.7314148681055156,
+  "threshold": 0.8318955302238464,
+  "threshold_tuning": {
+    "threshold": 0.8318955302238464,
+    "precision": 0.591937069813176,
+    "recall": 0.9852700490998363,
+    "constraint_met": false
+  },
+  "test": {
+    "accuracy": 0.5770833333333333,
+    "precision": 0.5709711846318036,
+    "recall": 0.9925788497217068,
+    "f1": 0.7249322493224932,
+    "roc_auc": 0.6481784249005152,
+    "ap": 0.7362007056781141
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\abl_ema_best.pt"
+}

@@ -1,0 +1,14 @@
+{
+  "tag": "hp06",
+  "lr": 0.0014812330977275277,
+  "weight_decay": 0.0003362463637644082,
+  "batch_size": 32.0,
+  "label_smoothing": 0.1,
+  "val_f1": 0.9708,
+  "threshold": 0.5443,
+  "test_f1": 0.9407,
+  "test_acc": 0.9354,
+  "precision": 0.9704,
+  "recall": 0.9128,
+  "roc_auc": 0.9847
+}

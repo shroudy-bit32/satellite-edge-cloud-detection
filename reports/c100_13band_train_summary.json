@@ -1,0 +1,31 @@
+{
+  "tag": "c100_13band",
+  "model": "mobilenetv2_100",
+  "epochs": 15,
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": true,
+    "ema_decay": 0.99,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.9674728940783986,
+  "threshold": 0.7284513711929321,
+  "threshold_tuning": {
+    "threshold": 0.7284513711929321,
+    "precision": 0.9911971830985915,
+    "recall": 0.9214402618657938,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.9270833333333334,
+    "precision": 0.9737373737373738,
+    "recall": 0.8942486085343229,
+    "f1": 0.9323017408123792,
+    "roc_auc": 0.9741978415205426,
+    "ap": 0.9837210458489206
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\c100_13band_best.pt"
+}

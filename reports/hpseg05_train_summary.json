@@ -1,0 +1,36 @@
+{
+  "tag": "hpseg05",
+  "task": "segmentation",
+  "encoder": "mobilenetv2_050",
+  "parameters": 540249,
+  "best_val_iou": 0.9159503525779155,
+  "test": {
+    "iou": 0.8648287532378388,
+    "dice": 0.9275154640727906,
+    "precision": 0.9434951749784691,
+    "recall": 0.9120680259016763,
+    "pixel_accuracy": 0.9261802196502671,
+    "image_level_accuracy": 0.9552083333333333
+  },
+  "hyperparameters": {
+    "lr": 0.000126775,
+    "weight_decay": 0.000165325,
+    "batch_size": 32,
+    "bce_weight": 0.3,
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B10",
+      "B11"
+    ]
+  },
+  "optimizations": {
+    "accum_steps": 1,
+    "effective_batch": 32,
+    "clip_grad": 0.0,
+    "bce_weight": 0.3
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\hpseg05_best.pt"
+}

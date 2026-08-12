@@ -1,0 +1,42 @@
+{
+  "ambiguous_band": [
+    0.02,
+    0.98
+  ],
+  "n_total": 3000,
+  "n_ambiguous": 559,
+  "measures": {
+    "cloud_fraction": {
+      "n": 559,
+      "flatness": 0.1076923076923077,
+      "valley": 0.308,
+      "peak": 0.0392,
+      "hist_min": 7,
+      "hist_max": 65
+    },
+    "filled_fraction": {
+      "n": 545,
+      "flatness": 0.125,
+      "valley": 0.308,
+      "peak": 0.0392,
+      "hist_min": 8,
+      "hist_max": 64
+    },
+    "hull_fraction": {
+      "n": 485,
+      "flatness": 0.12962962962962962,
+      "valley": 0.42319999999999997,
+      "peak": 0.0392,
+      "hist_min": 7,
+      "hist_max": 54
+    },
+    "solidity": {
+      "n": 537,
+      "flatness": 0.0,
+      "valley": 0.0392,
+      "peak": 0.8455999999999999,
+      "hist_min": 0,
+      "hist_max": 75
+    }
+  }
+}

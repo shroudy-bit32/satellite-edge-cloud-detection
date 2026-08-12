@@ -1,0 +1,34 @@
+{
+  "yalniz siniflandirici (256)": {
+    "stages": {
+      "clf256 yuklendi": 16.19,
+      "clf256 cikarim sonrasi tepe": 22.13
+    },
+    "toplam_tepe_MB": 22.14
+  },
+  "yalniz U-Net (64)": {
+    "stages": {
+      "unet64 yuklendi": 13.82,
+      "unet64 cikarim sonrasi tepe": 14.74
+    },
+    "toplam_tepe_MB": 14.75
+  },
+  "ONERILEN: clf256 + unet64": {
+    "stages": {
+      "clf256 yuklendi": 16.49,
+      "unet64 yuklendi": 21.28,
+      "clf256 cikarim sonrasi tepe": 27.12,
+      "unet64 cikarim sonrasi tepe": 27.78
+    },
+    "toplam_tepe_MB": 27.78
+  },
+  "alternatif: clf64 + unet64": {
+    "stages": {
+      "clf64 yuklendi": 14.86,
+      "unet64 yuklendi": 19.55,
+      "clf64 cikarim sonrasi tepe": 20.17,
+      "unet64 cikarim sonrasi tepe": 20.83
+    },
+    "toplam_tepe_MB": 20.83
+  }
+}

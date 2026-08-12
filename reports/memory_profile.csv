@@ -1,0 +1,2 @@
+model,girdi,disk_MB,agirlik_MB,cikarim_ek_MB,tepe_bellek_MB,python_taban_MB
+c64_tuned_int8,64x64,2.59,11.46,4.28,65.86,50.12

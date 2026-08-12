@@ -1,0 +1,22 @@
+{
+  "tag": "smoke_unet",
+  "task": "segmentation",
+  "encoder": "mobilenetv3_small_100",
+  "parameters": 1032393,
+  "best_val_iou": 0.24657330222176993,
+  "test": {
+    "iou": 0.25921790841173126,
+    "dice": 0.4117125505921153,
+    "precision": 0.26026594123014923,
+    "recall": 0.9847032935814439,
+    "pixel_accuracy": 0.51606140136703,
+    "image_level_accuracy": 0.375
+  },
+  "optimizations": {
+    "accum_steps": 1,
+    "effective_batch": 8,
+    "clip_grad": 0.0,
+    "bce_weight": 0.5
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\smoke_unet_best.pt"
+}

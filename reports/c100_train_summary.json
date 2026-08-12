@@ -1,0 +1,31 @@
+{
+  "tag": "c100",
+  "model": "mobilenetv2_100",
+  "epochs": 15,
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": true,
+    "ema_decay": 0.99,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.9615384615384616,
+  "threshold": 0.8055247068405151,
+  "threshold_tuning": {
+    "threshold": 0.8055247068405151,
+    "precision": 0.9911032028469751,
+    "recall": 0.911620294599018,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.9416666666666667,
+    "precision": 0.9878787878787879,
+    "recall": 0.9072356215213359,
+    "f1": 0.9458413926499033,
+    "roc_auc": 0.9812796636685337,
+    "ap": 0.9881168419834855
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\c100_best.pt"
+}

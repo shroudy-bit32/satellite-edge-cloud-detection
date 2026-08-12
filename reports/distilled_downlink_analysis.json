@@ -1,0 +1,38 @@
+{
+  "threshold": 0.8868058323860168,
+  "models": {
+    "PyTorch FP32": {
+      "test_goruntu_sayisi": 960,
+      "gercek_bulutlu_orani_%": 56.15,
+      "elenen_goruntu_orani_%": 52.6,
+      "veri_indirme_azalmasi_%": 52.6,
+      "dogru_elenen_bulutlu": 498,
+      "yanlis_elenen_kullanilabilir": 7,
+      "kaybedilen_kullanilabilir_veri_%": 1.663,
+      "kacan_bulutlu_(bosuna_indirilen)": 41,
+      "teorik_ust_sinir_%": 56.15
+    },
+    "ONNX FP32": {
+      "test_goruntu_sayisi": 960,
+      "gercek_bulutlu_orani_%": 56.15,
+      "elenen_goruntu_orani_%": 52.6,
+      "veri_indirme_azalmasi_%": 52.6,
+      "dogru_elenen_bulutlu": 498,
+      "yanlis_elenen_kullanilabilir": 7,
+      "kaybedilen_kullanilabilir_veri_%": 1.663,
+      "kacan_bulutlu_(bosuna_indirilen)": 41,
+      "teorik_ust_sinir_%": 56.15
+    },
+    "ONNX INT8": {
+      "test_goruntu_sayisi": 960,
+      "gercek_bulutlu_orani_%": 56.15,
+      "elenen_goruntu_orani_%": 51.56,
+      "veri_indirme_azalmasi_%": 51.56,
+      "dogru_elenen_bulutlu": 491,
+      "yanlis_elenen_kullanilabilir": 4,
+      "kaybedilen_kullanilabilir_veri_%": 0.95,
+      "kacan_bulutlu_(bosuna_indirilen)": 48,
+      "teorik_ust_sinir_%": 56.15
+    }
+  }
+}

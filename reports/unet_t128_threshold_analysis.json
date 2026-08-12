@@ -1,0 +1,85 @@
+{
+  "split": "test",
+  "rows": [
+    {
+      "esik_%": 5,
+      "gercekte_bulutlu_%": 65.34,
+      "elenen_%": 64.61,
+      "kaybedilen_temiz_alan_%": 29.5,
+      "kaybedilen_kullanilabilir_goruntu_%": 6.536,
+      "kacan_bulutlu": 115,
+      "precision": 0.9649,
+      "recall": 0.9542
+    },
+    {
+      "esik_%": 10,
+      "gercekte_bulutlu_%": 62.55,
+      "elenen_%": 61.67,
+      "kaybedilen_temiz_alan_%": 24.07,
+      "kaybedilen_kullanilabilir_goruntu_%": 5.911,
+      "kacan_bulutlu": 119,
+      "precision": 0.9641,
+      "recall": 0.9505
+    },
+    {
+      "esik_%": 20,
+      "gercekte_bulutlu_%": 58.46,
+      "elenen_%": 57.92,
+      "kaybedilen_temiz_alan_%": 17.91,
+      "kaybedilen_kullanilabilir_goruntu_%": 5.956,
+      "kacan_bulutlu": 116,
+      "precision": 0.9573,
+      "recall": 0.9483
+    },
+    {
+      "esik_%": 30,
+      "gercekte_bulutlu_%": 55.42,
+      "elenen_%": 55.16,
+      "kaybedilen_temiz_alan_%": 13.78,
+      "kaybedilen_kullanilabilir_goruntu_%": 5.841,
+      "kacan_bulutlu": 110,
+      "precision": 0.9528,
+      "recall": 0.9483
+    },
+    {
+      "esik_%": 40,
+      "gercekte_bulutlu_%": 52.99,
+      "elenen_%": 52.99,
+      "kaybedilen_temiz_alan_%": 11.12,
+      "kaybedilen_kullanilabilir_goruntu_%": 5.706,
+      "kacan_bulutlu": 103,
+      "precision": 0.9494,
+      "recall": 0.9494
+    },
+    {
+      "esik_%": 50,
+      "gercekte_bulutlu_%": 50.68,
+      "elenen_%": 50.6,
+      "kaybedilen_temiz_alan_%": 8.6,
+      "kaybedilen_kullanilabilir_goruntu_%": 5.544,
+      "kacan_bulutlu": 108,
+      "precision": 0.946,
+      "recall": 0.9445
+    },
+    {
+      "esik_%": 70,
+      "gercekte_bulutlu_%": 47.03,
+      "elenen_%": 47.06,
+      "kaybedilen_temiz_alan_%": 5.71,
+      "kaybedilen_kullanilabilir_goruntu_%": 5.211,
+      "kacan_bulutlu": 105,
+      "precision": 0.9413,
+      "recall": 0.9419
+    },
+    {
+      "esik_%": 90,
+      "gercekte_bulutlu_%": 42.99,
+      "elenen_%": 43.12,
+      "kaybedilen_temiz_alan_%": 3.2,
+      "kaybedilen_kullanilabilir_goruntu_%": 5.116,
+      "kacan_bulutlu": 107,
+      "precision": 0.9324,
+      "recall": 0.9352
+    }
+  ]
+}

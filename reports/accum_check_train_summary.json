@@ -1,0 +1,22 @@
+{
+  "tag": "accum_check",
+  "task": "segmentation",
+  "encoder": "mobilenetv3_small_100",
+  "parameters": 1032393,
+  "best_val_iou": 0.15691010069199593,
+  "test": {
+    "iou": 0.1674242574617177,
+    "dice": 0.28682675795300216,
+    "precision": 0.1706673860991567,
+    "recall": 0.8980692788172593,
+    "pixel_accuracy": 0.2319763183593042,
+    "image_level_accuracy": 0.3625
+  },
+  "optimizations": {
+    "accum_steps": 4,
+    "effective_batch": 16,
+    "clip_grad": 1.0,
+    "bce_weight": 0.5
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\accum_check_best.pt"
+}

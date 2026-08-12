@@ -1,0 +1,31 @@
+{
+  "tag": "abl_balanced",
+  "model": "mobilenetv3_small_100",
+  "epochs": 15,
+  "optimizations": {
+    "balanced_sampling": true,
+    "warmup_epochs": 2,
+    "ema": false,
+    "ema_decay": null,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.9717138103161398,
+  "threshold": 0.7532851696014404,
+  "threshold_tuning": {
+    "threshold": 0.7532851696014404,
+    "precision": 0.9913194444444444,
+    "recall": 0.9345335515548282,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.9239583333333333,
+    "precision": 0.9568627450980393,
+    "recall": 0.9053803339517625,
+    "f1": 0.9304099142040038,
+    "roc_auc": 0.9850871897020523,
+    "ap": 0.9889785485234655
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\abl_balanced_best.pt"
+}

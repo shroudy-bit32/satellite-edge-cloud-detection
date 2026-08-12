@@ -1,0 +1,9 @@
+model,ayar,load_MB,peak_MB,ms
+64x64 (v3.2),varsayilan (arena+pattern),10.81,14.68,0.689
+64x64 (v3.2),arena KAPALI,10.53,14.6,0.654
+64x64 (v3.2),pattern KAPALI,11.0,14.71,0.708
+64x64 (v3.2),ikisi de KAPALI,10.48,14.32,0.737
+256x256 (v3),varsayilan (arena+pattern),10.75,26.66,8.52
+256x256 (v3),arena KAPALI,10.32,26.18,11.107
+256x256 (v3),pattern KAPALI,11.06,24.91,8.979
+256x256 (v3),ikisi de KAPALI,10.38,22.55,12.225

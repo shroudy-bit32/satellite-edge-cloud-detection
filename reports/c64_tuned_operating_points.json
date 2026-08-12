@@ -1,0 +1,91 @@
+{
+  "model": "outputs\\checkpoints\\c64_tuned_best.pt",
+  "tag": "c64_tuned",
+  "ambiguous_band": [
+    0.02,
+    0.98
+  ],
+  "operating_points": {
+    "mevcut (tum val, precision>=0.99)": {
+      "threshold": 0.590366,
+      "s2cmc_test": {
+        "accuracy": 0.9316,
+        "precision": 0.9603,
+        "recall": 0.9123,
+        "f1": 0.9357,
+        "veri_azalmasi_%": 51.78,
+        "kaybedilen_kullanilabilir_%": 4.521
+      },
+      "sparcs": {
+        "accuracy": 0.7668,
+        "precision": 1.0,
+        "recall": 0.0034,
+        "f1": 0.0068,
+        "veri_azalmasi_%": 0.08,
+        "kaybedilen_kullanilabilir_%": 0.0,
+        "kar_buz_yanlis_eleme_%": 0.0
+      }
+    },
+    "belirsiz bant (precision>=0.99)": {
+      "threshold": 0.87722,
+      "s2cmc_test": {
+        "accuracy": 0.9033,
+        "precision": 0.9903,
+        "recall": 0.8306,
+        "f1": 0.9035,
+        "veri_azalmasi_%": 45.71,
+        "kaybedilen_kullanilabilir_%": 0.973
+      },
+      "sparcs": {
+        "accuracy": 0.766,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "veri_azalmasi_%": 0.0,
+        "kaybedilen_kullanilabilir_%": 0.0,
+        "kar_buz_yanlis_eleme_%": 0.0
+      }
+    },
+    "belirsiz bant (precision>=0.995)": {
+      "threshold": 0.900788,
+      "s2cmc_test": {
+        "accuracy": 0.8931,
+        "precision": 0.995,
+        "recall": 0.8079,
+        "f1": 0.8917,
+        "veri_azalmasi_%": 44.25,
+        "kaybedilen_kullanilabilir_%": 0.486
+      },
+      "sparcs": {
+        "accuracy": 0.766,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "veri_azalmasi_%": 0.0,
+        "kaybedilen_kullanilabilir_%": 0.0,
+        "kar_buz_yanlis_eleme_%": 0.0
+      }
+    },
+    "dengeli (tum val, en iyi F1)": {
+      "threshold": 0.473674,
+      "s2cmc_test": {
+        "accuracy": 0.9357,
+        "precision": 0.9516,
+        "recall": 0.9294,
+        "f1": 0.9404,
+        "veri_azalmasi_%": 53.23,
+        "kaybedilen_kullanilabilir_%": 5.666
+      },
+      "sparcs": {
+        "accuracy": 0.6522,
+        "precision": 0.3968,
+        "recall": 0.9349,
+        "f1": 0.5571,
+        "veri_azalmasi_%": 55.13,
+        "kaybedilen_kullanilabilir_%": 43.41,
+        "kar_buz_yanlis_eleme_%": 64.37
+      }
+    }
+  },
+  "note": "Esik kodda sabit degildir; burada tanimli noktalardan biri secilerek kullanilir ve yerden guncellenebilir."
+}

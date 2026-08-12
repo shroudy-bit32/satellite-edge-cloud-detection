@@ -1,0 +1,31 @@
+{
+  "tag": "smoke",
+  "model": "mobilenetv3_small_100",
+  "epochs": 3,
+  "optimizations": {
+    "balanced_sampling": true,
+    "warmup_epochs": 1,
+    "ema": true,
+    "ema_decay": 0.999,
+    "accum_steps": 1,
+    "effective_batch": 16,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.13953488372093023,
+  "threshold": 0.4998358190059662,
+  "threshold_tuning": {
+    "threshold": 0.4998358190059662,
+    "precision": 1.0,
+    "recall": 0.225,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.575,
+    "precision": 1.0,
+    "recall": 0.15,
+    "f1": 0.2608695652173913,
+    "roc_auc": 0.6650000000000001,
+    "ap": 0.7431791541286457
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\smoke_best.pt"
+}

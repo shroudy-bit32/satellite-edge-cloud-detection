@@ -1,0 +1,85 @@
+{
+  "split": "test",
+  "rows": [
+    {
+      "esik_%": 5,
+      "gercekte_bulutlu_%": 68.23,
+      "elenen_%": 68.96,
+      "kaybedilen_kullanilabilir_%": 10.164,
+      "kacan_bulutlu": 24,
+      "precision": 0.9532,
+      "recall": 0.9634,
+      "net_kazanc_%": 62.5
+    },
+    {
+      "esik_%": 10,
+      "gercekte_bulutlu_%": 64.69,
+      "elenen_%": 65.1,
+      "kaybedilen_kullanilabilir_%": 8.26,
+      "kacan_bulutlu": 24,
+      "precision": 0.9552,
+      "recall": 0.9614,
+      "net_kazanc_%": 59.27
+    },
+    {
+      "esik_%": 20,
+      "gercekte_bulutlu_%": 60.0,
+      "elenen_%": 60.62,
+      "kaybedilen_kullanilabilir_%": 6.51,
+      "kacan_bulutlu": 19,
+      "precision": 0.957,
+      "recall": 0.967,
+      "net_kazanc_%": 55.42
+    },
+    {
+      "esik_%": 30,
+      "gercekte_bulutlu_%": 56.15,
+      "elenen_%": 56.67,
+      "kaybedilen_kullanilabilir_%": 6.413,
+      "kacan_bulutlu": 22,
+      "precision": 0.9504,
+      "recall": 0.9592,
+      "net_kazanc_%": 51.04
+    },
+    {
+      "esik_%": 40,
+      "gercekte_bulutlu_%": 53.75,
+      "elenen_%": 52.81,
+      "kaybedilen_kullanilabilir_%": 4.955,
+      "kacan_bulutlu": 31,
+      "precision": 0.9566,
+      "recall": 0.9399,
+      "net_kazanc_%": 48.23
+    },
+    {
+      "esik_%": 50,
+      "gercekte_bulutlu_%": 50.52,
+      "elenen_%": 49.79,
+      "kaybedilen_kullanilabilir_%": 4.842,
+      "kacan_bulutlu": 30,
+      "precision": 0.9519,
+      "recall": 0.9381,
+      "net_kazanc_%": 45.0
+    },
+    {
+      "esik_%": 70,
+      "gercekte_bulutlu_%": 46.04,
+      "elenen_%": 45.73,
+      "kaybedilen_kullanilabilir_%": 5.019,
+      "kacan_bulutlu": 29,
+      "precision": 0.9408,
+      "recall": 0.9344,
+      "net_kazanc_%": 40.31
+    },
+    {
+      "esik_%": 90,
+      "gercekte_bulutlu_%": 41.04,
+      "elenen_%": 40.42,
+      "kaybedilen_kullanilabilir_%": 5.124,
+      "kacan_bulutlu": 35,
+      "precision": 0.9253,
+      "recall": 0.9112,
+      "net_kazanc_%": 34.38
+    }
+  ]
+}

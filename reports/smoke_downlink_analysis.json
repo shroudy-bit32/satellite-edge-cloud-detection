@@ -1,0 +1,12 @@
+{
+  "threshold": 0.4998358190059662,
+  "test_goruntu_sayisi": 80,
+  "gercek_bulutlu_orani_%": 50.0,
+  "elenen_goruntu_orani_%": 8.75,
+  "veri_indirme_azalmasi_%": 8.75,
+  "dogru_elenen_bulutlu": 7,
+  "yanlis_elenen_kullanilabilir": 0,
+  "kaybedilen_kullanilabilir_veri_%": 0.0,
+  "kacan_bulutlu_(bosuna_indirilen)": 33,
+  "teorik_ust_sinir_%": 50.0
+}

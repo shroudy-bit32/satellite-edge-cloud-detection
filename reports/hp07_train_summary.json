@@ -1,0 +1,45 @@
+{
+  "tag": "hp07",
+  "model": "mobilenetv2_100",
+  "epochs": 10,
+  "hyperparameters": {
+    "lr": 0.000213487,
+    "weight_decay": 0.0076347,
+    "batch_size": 64,
+    "label_smoothing": 0.1,
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B10",
+      "B11"
+    ]
+  },
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": true,
+    "ema_decay": 0.99,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.9535080304311073,
+  "threshold": 0.5255354642868042,
+  "threshold_tuning": {
+    "threshold": 0.5255354642868042,
+    "precision": 0.9911816578483245,
+    "recall": 0.9198036006546645,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.9270833333333334,
+    "precision": 0.958904109589041,
+    "recall": 0.9090909090909091,
+    "f1": 0.9333333333333333,
+    "roc_auc": 0.9698218306972973,
+    "ap": 0.9824878831064833
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\hp07_best.pt"
+}

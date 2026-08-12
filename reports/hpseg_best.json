@@ -1,0 +1,11 @@
+{
+  "tag": "hpseg02",
+  "lr": 0.0011282140846019507,
+  "weight_decay": 0.0013939821771844683,
+  "batch_size": 16.0,
+  "bce_weight": 0.3,
+  "val": 0.9359,
+  "test_iou": 0.8925,
+  "test_dice": 0.9432,
+  "test_image_level_accuracy": 0.9563
+}

@@ -1,0 +1,31 @@
+{
+  "tag": "abl_plain",
+  "model": "mobilenetv3_small_100",
+  "epochs": 15,
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": false,
+    "ema_decay": null,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.9776674937965261,
+  "threshold": 0.6239696741104126,
+  "threshold_tuning": {
+    "threshold": 0.6239696741104126,
+    "precision": 0.9915824915824916,
+    "recall": 0.9639934533551555,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.9260416666666667,
+    "precision": 0.9398496240601504,
+    "recall": 0.9276437847866419,
+    "f1": 0.9337068160597572,
+    "roc_auc": 0.9833949559093774,
+    "ap": 0.988068572436003
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\abl_plain_best.pt"
+}

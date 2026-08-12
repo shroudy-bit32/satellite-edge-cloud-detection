@@ -1,0 +1,26 @@
+{
+  "tag": "distilled",
+  "model": "mobilenetv2_100",
+  "teacher": "mobilenetv2_140",
+  "teacher_test_f1": 0.9471,
+  "alpha": 0.3,
+  "temperature": 3.0,
+  "epochs": 15,
+  "best_val_f1": 0.9685430463576159,
+  "threshold": 0.8868058323860168,
+  "threshold_tuning": {
+    "threshold": 0.8868058323860168,
+    "precision": 0.9913793103448276,
+    "recall": 0.9410801963993454,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.95,
+    "precision": 0.9861386138613861,
+    "recall": 0.9239332096474954,
+    "f1": 0.9540229885057471,
+    "roc_auc": 0.9873941803022225,
+    "ap": 0.991763431048304
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\distilled_best.pt"
+}
