@@ -77,15 +77,36 @@ Decision threshold tuned under **High-Precision Constraint ($\ge 0.995$)** on am
 
 ---
 
-## File & Model Artifact Mapping
+## Project Structure
+.
+├── src/                    # Modular Python source code
+│   ├── dataset.py          # Dataset loaders and preprocessing
+│   ├── model.py            # Model architectures
+│   ├── export.py           # ONNX / INT8 quantization
+│   └── benchmark.py        # Evaluation engine
+├── teslim/                 # Technical documentation
+│   └── TEKNIK_RAPOR.pdf    # Detailed analysis report
+├── requirements.txt        # Package dependencies
+├── smoke_test.py           # Quick verification script
+└── README.md               # Main documentation
 
-```text
-├── releases/
-│   └── v3.2/
-│       ├── unet_int8.onnx         # Primary deployable INT8 model (0.96 MB, 64x64)
-│       ├── classifier_int8.onnx   # Backup INT8 classifier (2.59 MB, 256x256)
-│       └── operating_points.json  # Measured operating thresholds and sensitivity trade-offs
-├── docs/
-│   ├── TEKNIK_RAPOR.pdf          # Full technical docket, quantization failure bisect analyses
-│   └── STAJ_RAPORU.pdf           # Final academic report
-└── README.md
+Note: Frozen .onnx and .pt model weights are packaged into releases.zip under the Releases section to keep the main repository lightweight.
+
+## Quick Start & Execution
+Install Dependencies
+
+``pip install -r requirements.txt``
+
+## Download Model Weights
+
+Download the v3.2.zip (or releases.zip) package from the Releases section on the right side of the repository.
+
+Extract the ZIP file into the project root directory. (This will extract the releases/v3.1/ and releases/v3.2/ folders).
+
+## Quick System Check (Smoke Test)
+``python smoke_test.py``
+
+## Run Benchmark & Metric Tests
+``python -m src.benchmark --tag v3.2 --task segmentation --threshold 0.30``
+
+(To test the balanced version v3.1, pass the --tag v3.1 argument.)
