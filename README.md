@@ -77,7 +77,9 @@ Decision threshold tuned under **High-Precision Constraint ($\ge 0.995$)** on am
 
 ---
 
-## Project Structure
+##  Project Structure
+
+```text
 .
 ├── src/                    # Modular Python source code
 │   ├── dataset.py          # Dataset loaders and preprocessing
