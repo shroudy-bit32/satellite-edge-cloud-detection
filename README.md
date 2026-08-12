@@ -6,7 +6,7 @@ This repository contains the software framework, trained ONNX models, and techni
 
 ---
 
-## 🛠 Project Architecture & Technical Specifications
+## Project Architecture & Technical Specifications
 
 ### 1. Model Pipeline & Topologies
 - **Primary Binary Classifier:** MobileNetV2 backbone (6 input channels adapted via `timm`), single logit output.
@@ -23,7 +23,7 @@ This repository contains the software framework, trained ONNX models, and techni
 
 ---
 
-## 🔬 Benchmark & Memory Profiling
+## Benchmark & Memory Profiling
 
 Measurements reflect ONNX Runtime CPU execution threads.
 
@@ -39,7 +39,7 @@ Measurements reflect ONNX Runtime CPU execution threads.
 
 ---
 
-## 📈 Release Matrix & Trade-Off Analysis
+##  Release Matrix & Trade-Off Analysis
 
 Every significant iteration was frozen alongside its measured metrics to trace progress and trade-offs.
 
@@ -66,7 +66,7 @@ Every significant iteration was frozen alongside its measured metrics to trace p
 
 ---
 
-## 🎯 Operating Point & Downlink Analysis
+## Operating Point & Downlink Analysis
 
 Decision threshold tuned under **High-Precision Constraint ($\ge 0.995$)** on ambiguous cloud scenes ($2\% < \text{cloud} < 98\%$):
 
@@ -77,7 +77,7 @@ Decision threshold tuned under **High-Precision Constraint ($\ge 0.995$)** on am
 
 ---
 
-## 📁 File & Model Artifact Mapping
+## File & Model Artifact Mapping
 
 ```text
 ├── releases/
