@@ -1,0 +1,64 @@
+{
+  "tag": "unet_t64",
+  "split": "test",
+  "kare": 15360,
+  "kare_boyutu": 64,
+  "pixel_threshold": 0.5,
+  "cloud_fraction_threshold": 0.3,
+  "tam_sahne_sikistirilmis_bayt": 475623509,
+  "kodek": "zlib level 6 (VEKIL - gercek misyon CCSDS 122/JPEG2000 kullanir)",
+  "rows": [
+    {
+      "blok": "64x64",
+      "blok_sayisi_kare_basina": 1,
+      "indirilen_blok_%": 48.58,
+      "indirilen_alan_%": 48.58,
+      "veri_azalmasi_alan_%": 51.42,
+      "korunan_temiz_alan_%": 91.87,
+      "kaybedilen_temiz_alan_%": 8.13,
+      "bosuna_inen_bulut_alani_%": 8.286,
+      "yuk_bayt": 225893898,
+      "harita_bayt": 15360,
+      "toplam_bayt": 225909258
+    },
+    {
+      "blok": "32x32",
+      "blok_sayisi_kare_basina": 4,
+      "indirilen_blok_%": 49.17,
+      "indirilen_alan_%": 49.17,
+      "veri_azalmasi_alan_%": 50.83,
+      "korunan_temiz_alan_%": 93.483,
+      "kaybedilen_temiz_alan_%": 6.517,
+      "bosuna_inen_bulut_alani_%": 7.916,
+      "yuk_bayt": 236471920,
+      "harita_bayt": 15360,
+      "toplam_bayt": 236487280
+    },
+    {
+      "blok": "16x16",
+      "blok_sayisi_kare_basina": 16,
+      "indirilen_blok_%": 49.82,
+      "indirilen_alan_%": 49.82,
+      "veri_azalmasi_alan_%": 50.18,
+      "korunan_temiz_alan_%": 94.904,
+      "kaybedilen_temiz_alan_%": 5.096,
+      "bosuna_inen_bulut_alani_%": 7.854,
+      "yuk_bayt": 254386107,
+      "harita_bayt": 30720,
+      "toplam_bayt": 254416827
+    },
+    {
+      "blok": "8x8",
+      "blok_sayisi_kare_basina": 64,
+      "indirilen_blok_%": 50.46,
+      "indirilen_alan_%": 50.46,
+      "veri_azalmasi_alan_%": 49.54,
+      "korunan_temiz_alan_%": 95.999,
+      "kaybedilen_temiz_alan_%": 4.001,
+      "bosuna_inen_bulut_alani_%": 8.065,
+      "yuk_bayt": 290161018,
+      "harita_bayt": 122880,
+      "toplam_bayt": 290283898
+    }
+  ]
+}

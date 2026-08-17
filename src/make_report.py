@@ -322,11 +322,12 @@ def section_memory() -> str:
         "  taban kullanimi HARIC (uydu yaziliminda bu maliyet olmaz)", "",
         "**Bulgular:**", "",
         "1. **Gercek bellek ihtiyaci, disk boyutunun 10-25 katidir.** INT8 siniflandirici",
-        "   diskte 2.59 MB, calisirken 22.12 MB. Yalnizca dosya boyutuna bakarak bellek",
+        "   diskte 2.59 MB, calisirken 22.14 MB. Yalnizca dosya boyutuna bakarak bellek",
         "   kisiti degerlendirmek yaniltici olur.",
         "",
         "2. **U-Net diskte kucuk, bellekte buyuktur.** Siniflandiriciya gore diskte 2.7 kat",
-        "   kucuk (0.96 MB vs 2.59 MB) ama bellekte %22 daha pahali (26.89 MB vs 22.12 MB).",
+        "   kucuk (0.96 MB vs 2.59 MB) ama AYNI 256x256 girdide bellekte daha pahali",
+        "   (26.47 MB vs 22.14 MB, bkz. bolum 13 surum matrisi).",
         "   Sebep mimaridir: segmentasyon decoder'i tam cozunurlukte ara tensorler tasir,",
         "   siniflandirici ise havuzlama ile hizla kuculur. Az parametre, buyuk aktivasyon.",
         "   Dagitim karari bu nedenle kisita baglidir: disk darsa U-Net, RAM darsa",
@@ -527,7 +528,7 @@ def section_classifier_tiling() -> str:
          "sonuc": "256x256"},
         {"olcut": "sure (ms/kare)", "256x256": "5.76", "64x64": "1.89", "sonuc": "64x64"},
         {"olcut": "sure (ms/sahne)", "256x256": "92", "64x64": "484", "sonuc": "256x256"},
-        {"olcut": "bellek", "256x256": "22.12 MB", "64x64": "15.74 MB", "sonuc": "64x64"},
+        {"olcut": "bellek", "256x256": "22.14 MB", "64x64": "15.74 MB", "sonuc": "64x64"},
     ]
 
     return "\n".join([
@@ -608,6 +609,278 @@ def section_deployment_memory() -> str:
         "   asar ve gelecek calisma olarak birakilmistir.", ""])
 
 
+def section_unet_external(unet_tag: str) -> str:
+    """U-Net'in harici sensorde (SPARCS) degerlendirmesi + gunes duzeltmesi."""
+    d = load_json(f"{unet_tag}_external_sparcs.json")
+    if not d:
+        return ""
+    clf = load_json("c6_tuned_external_sparcs.json")
+    sun = load_json(f"{unet_tag}_sun_external_sparcs.json")
+
+    def brk(src, key):
+        s = (src or {}).get(key, {})
+        return {"n": s.get("n"), "accuracy": s.get("accuracy"), "precision": s.get("precision"),
+                "recall": s.get("recall"), "f1": s.get("f1"), "roc_auc": s.get("roc_auc")}
+
+    rows = [{"kirilim": k, **{kk: (round(vv, 4) if isinstance(vv, float) else vv)
+                              for kk, vv in brk(d, key).items()}}
+            for k, key in [("genel", "overall"), ("kar/buz olmayan", "non_snowy"),
+                           ("kar/buz agirlikli (>%20)", "snowy")]]
+
+    lines = [
+        "## 6b. U-Net'in harici dogrulamasi (SPARCS)", "",
+        "Siniflandiriciya uygulanan harici dogrulamanin aynisi, U-Net maskesinden",
+        "`mask_to_decision` ile goruntu karari uretilerek tekrarlandi. Boylece iki",
+        "model AYNI olcutlerle, ayni veride karsilastirilabiliyor.", "",
+        df_to_md(pd.DataFrame(rows)), "",
+    ]
+
+    if "pixel" in d:
+        p = d["pixel"]
+        lines += [
+            "**Piksel bazli segmentasyon (ilk kez olculdu):** "
+            f"IoU {p['iou']:.4f}, Dice {p['dice']:.4f}, "
+            f"piksel dogrulugu {p['pixel_accuracy']:.4f}.", "",
+            "Egitim dagiliminda (S2CMC) IoU 0.8892 idi; farkli sensorde 0.167 dusuyor.",
+            "Gercek bir genelleme acigi, ama cokus degil.", "",
+        ]
+
+    if clf:
+        co, uo = clf.get("overall", {}), d.get("overall", {})
+        cs, us = clf.get("snowy", {}), d.get("snowy", {})
+        cmp_rows = [
+            {"olcut": "ROC-AUC", "siniflandirici 256px": fmt(co.get("roc_auc")),
+             "U-Net 64px": fmt(uo.get("roc_auc"))},
+            {"olcut": "F1", "siniflandirici 256px": fmt(co.get("f1")),
+             "U-Net 64px": fmt(uo.get("f1"))},
+            {"olcut": "veri azalmasi %",
+             "siniflandirici 256px": fmt(clf.get("downlink", {}).get("veri_indirme_azalmasi_%"), 2),
+             "U-Net 64px": fmt(d.get("downlink", {}).get("veri_indirme_azalmasi_%"), 2)},
+            {"olcut": "kaybedilen kullanilabilir %",
+             "siniflandirici 256px": fmt(clf.get("downlink", {}).get("kaybedilen_kullanilabilir_veri_%"), 3),
+             "U-Net 64px": fmt(d.get("downlink", {}).get("kaybedilen_kullanilabilir_veri_%"), 3)},
+            {"olcut": "kar/buz yanlis eleme %",
+             "siniflandirici 256px": fmt(100 * cs.get("kari_bulut_sanma_orani", 0), 2),
+             "U-Net 64px": fmt(100 * us.get("kari_bulut_sanma_orani", 0), 2)},
+        ]
+        lines += ["### 6b.1 Dogrudan karsilastirma", "", df_to_md(pd.DataFrame(cmp_rows)), "",
+                  "**Kar/buz yanlis elemesi 11.6 kat aziyor.** Siniflandirici ham bant",
+                  "genisligi kazancinda onde, U-Net korunan veri basina kazancta.", "",
+                  "**Bu fark karelemeden gelmiyor.** Ayni 64x64 izgarada olculmus",
+                  "siniflandirici (`c64_tuned_operating_points.json`) dengeli noktasinda",
+                  "kar/buz yanlis elemesini %64.37 veriyor - clf256'nin %58.62'sinden DAHA",
+                  "KOTU. Ince kareleme bu sorunu cozmuyor; fark gorev turundendir:",
+                  "segmentasyon her pikselde yerel karar verir ve sensorler arasinda en cok",
+                  "degisen ozellige (dokusal istatistikler) daha az bagimlidir.", ""]
+
+    if sun:
+        so, ss = sun.get("overall", {}), sun.get("snowy", {})
+        uo, us = d.get("overall", {}), d.get("snowy", {})
+        sun_rows = [
+            {"olcut": "ROC-AUC", "duzeltmesiz": fmt(uo.get("roc_auc")), "duzeltmeli": fmt(so.get("roc_auc"))},
+            {"olcut": "precision", "duzeltmesiz": fmt(uo.get("precision")), "duzeltmeli": fmt(so.get("precision"))},
+            {"olcut": "recall", "duzeltmesiz": fmt(uo.get("recall")), "duzeltmeli": fmt(so.get("recall"))},
+            {"olcut": "F1", "duzeltmesiz": fmt(uo.get("f1")), "duzeltmeli": fmt(so.get("f1"))},
+            {"olcut": "IoU", "duzeltmesiz": fmt(d.get("pixel", {}).get("iou")),
+             "duzeltmeli": fmt(sun.get("pixel", {}).get("iou"))},
+            {"olcut": "kar/buz yanlis eleme %",
+             "duzeltmesiz": fmt(100 * us.get("kari_bulut_sanma_orani", 0), 2),
+             "duzeltmeli": fmt(100 * ss.get("kari_bulut_sanma_orani", 0), 2)},
+        ]
+        lines += [
+            "### 6b.2 Negatif sonuc: gunes yuksekligi duzeltmesi yardimci olmuyor", "",
+            "USGS'in `l8cloudmasks.zip` arsivi 80 sahnenin hepsi icin MTL dosyasi",
+            "iceriyor, bu yuzden `1/sin(SUN_ELEVATION)` duzeltmesi uygulanabildi",
+            "(carpan 1.07-2.00, medyan 1.22). Ayni U-Net, iki sette:", "",
+            df_to_md(pd.DataFrame(sun_rows)), "",
+            "**ROC-AUC pratikte degismiyor.** Bu belirleyici: duzeltme modelin ayirt",
+            "etme yetenegine hicbir sey katmiyor. Yaptigi tek sey goruntuleri ~1.22 kat",
+            "parlatarak sabit esigin skor dagilimi uzerindeki yerini kaydirmak - recall",
+            "yukseliyor, precision dusuyor. Bilgi kazanci degil, esik kaymasi.", "",
+            "Sonuc: **radyometrik uyumsuzluk SPARCS'taki performans acigini",
+            "aciklamiyor.** Acik gercek bir alan kaymasidir (spektral tepki farklari,",
+            "farkli yuzey ortusu, farkli cografya) ve olcek duzeltmesiyle kapanmiyor.",
+            "Raporun onceki 'SPARCS karsilastirmasi kotumser' cekincesi bu olcumle",
+            "ELENMISTIR.", "",
+        ]
+    return "\n".join(lines)
+
+
+def section_partial_downlink(unet_tag: str) -> str:
+    """Kismi indirme odunlesimi: blok boyutu vs bayt maliyeti."""
+    df = load_csv(f"{unet_tag}_partial_downlink.csv")
+    meta = load_json(f"{unet_tag}_partial_downlink.json")
+    if df is None or df.empty:
+        return ""
+
+    base = df.iloc[0]
+    marj = []
+    for _, r in df.iloc[1:].iterrows():
+        dk = base["kaybedilen_temiz_alan_%"] - r["kaybedilen_temiz_alan_%"]
+        db = base["veri_azalmasi_bayt_%"] - r["veri_azalmasi_bayt_%"]
+        marj.append({
+            "adim": f"{base['blok'].split('x')[0]} -> {r['blok'].split('x')[0]}",
+            "kurtarilan temiz alan (puan)": f"+{dk:.2f}",
+            "kaybedilen bant genisligi kazanci (puan)": f"-{db:.2f}",
+            "oran": f"{db / dk:.2f} : 1" if dk else "-",
+        })
+
+    show = df[["blok", "indirilen_alan_%", "kaybedilen_temiz_alan_%",
+               "veri_azalmasi_bayt_%", "bayt_referansa_gore"]]
+
+    lines = [
+        "## 6c. Kismi indirme odunlesimi (olculdu)", "",
+        "Ikili karar bir kareyi ya tamamen indirir ya tamamen atar; dogru sekilde",
+        "atilan bulutlu karelerin icindeki temiz pikseller de kaybolur. Bu bir hata",
+        "degil, yontemin YAPISAL maliyetidir ve ikili siniflandiriciyla kapatilamaz.",
+        "U-Net maskesi hangi bolgenin temiz oldugunu bildirdigi icin, kareyi daha",
+        "kucuk bloklara bolup yalnizca temiz bloklari indirmek mumkun.", "",
+        "Karar TAHMIN EDILEN maskeden verilir (uyduda olan bilgi budur), kayip",
+        "muhasebesi GERCEK maskeden yapilir. Her blok BAGIMSIZ bir iletim birimi",
+        "olarak sikistirilir; blok haritasi da maliyete eklenir. `blok = 64x64`",
+        "satiri mevcut ikili davranistir.", "",
+        f"Test bolumu, {meta['kare']:,} kare:" if meta else "Test bolumu:", "",
+        df_to_md(show), "",
+        "**Negatif sonuc: odunlesim elverissiz.** Blogu 8x8'e kadar kucultmek yapisal",
+        "kaybin yarisini kurtariyor ama bant genisligi kazancini 13.5 puan dusuruyor.",
+        "Marjinal oran her adimda kotulesiyor:", "",
+        df_to_md(pd.DataFrame(marj)), "",
+        "**Neden:** iki etken ters yonde calisiyor.", "",
+        "1. **Kurtarilan alan kucuk.** Indirilen alan yalnizca %48.58'den %50.46'ya",
+        "   cikiyor. Sebep, U-Net maskelerinin MEKANSAL OLARAK TUTARLI olmasi: %30'dan",
+        "   fazla bulutlu bir kare genellikle buyuk olcude bulutludur, satranc tahtasi",
+        "   degil. Ince bolme kurtarilacak fazla temiz ada bulamiyor.",
+        "2. **Parcalama sikistirmayi bozuyor.** Yuk 225.9 MB'dan 290.2 MB'a cikiyor",
+        "   (+%28). Kucuk bloklar bagimsiz sikistirildiginda baglam kaybediyor.", "",
+        "Blok haritasi maliyeti ihmal edilebilir cikti (en kotu durumda 122 KB, yukun",
+        "%0.04'u). Yani kismi indirmenin maliyeti 'koordinat/metadata yuku' DEGIL,",
+        "parcalanmanin kendisidir. Bu, tahminle bilinemezdi; gercekten sikistirip",
+        "bayt saymak gerekiyordu.", "",
+    ]
+    if meta:
+        lines += [
+            f"> **Kodek cekincesi:** sikistirma vekili {meta['kodek']}.",
+            "> Mutlak bayt sayilari gercek misyonu temsil etmez; ancak karsilastirma tek",
+            "> kodekle yapildigi icin olculen sey - blok boyutunun sikistirmaya etkisi -",
+            "> gecerlidir.", "",
+        ]
+    lines += [
+        "**Sonucun siniri:** bu, blok tabanli bir protokolun ve genel amacli bir",
+        "kodegin sonucudur; kismi indirme fikrinin tumden reddi degildir. Bolge-ilgi",
+        "kodlamasi (JPEG2000 ROI) ya da bulutlu bolgeleri atmak yerine kayipli",
+        "kodlamak, parcalanma cezasini odemeden ayni kazanci verebilir. Denenmemistir.", "",
+        "**U-Net'in gerekcesi bu olcumle degisiyor.** Kismi indirme, U-Net'i projede",
+        "tutmanin ana gerekcesi olarak gosterilmisti; olcum bunu desteklemiyor. Buna",
+        "karsilik bolum 6b daha guclu ve olculmus bir gerekce sagliyor: farkli",
+        "sensorde dayaniklilik. Gerekce spekulatif olandan olculmus olana kaymistir.", "",
+    ]
+    return "\n".join(lines)
+
+
+def section_tradeoff_matrix() -> str:
+    """Varyantlar arasi odunlesim: hangi olcutte hangisi kazaniyor."""
+    lines = ["## 6d. Varyantlar arasi odunlesim matrisi", "",
+             "Bu bolum, uretilen tum varyantlari ayni tabloda karsilastirir. Hicbiri her",
+             "olcutte kazanmiyor - secim, hangi kisitin bagladigina baglidir.", ""]
+
+    # --- Siniflandirici varyantlari ---
+    rows = []
+    specs = [("c6_tuned", "mobilenetv2_100", "256x256"),
+             ("c050", "mobilenetv2_050", "256x256"),
+             ("c64_tuned", "mobilenetv2_100", "64x64")]
+    for tag, backbone, patch in specs:
+        b = load_csv(f"{tag}_benchmark.csv")
+        dl = load_json(f"{tag}_downlink_analysis.json")
+        row = {"varyant": tag, "omurga": backbone, "kare": patch}
+        if b is not None and (b["model"] == "ONNX INT8").any():
+            i8 = b[b["model"] == "ONNX INT8"].iloc[0]
+            row["INT8 disk MB"] = i8["boyut_MB"]
+            row["INT8 F1"] = round(float(i8["f1"]), 4)
+            row["ms/kare"] = round(float(i8["latency_mean_ms"]), 2)
+        if dl:
+            models = dl.get("models", dl)
+            i8 = models.get("ONNX INT8", {})
+            row["INT8 kayip %"] = i8.get("kaybedilen_kullanilabilir_veri_%")
+        rows.append(row)
+
+    if rows:
+        lines += ["### 6d.1 Siniflandirici varyantlari", "", df_to_md(pd.DataFrame(rows)), "",
+                  "> **Karsilastirma uyarisi:** c64_tuned'un F1 ve kayip degerleri 64x64",
+                  "> karelerde olculmustur; kare boyutu degisince ETIKET TANIMI da degisir",
+                  "> (bulut orani hangi pencerede olculuyor). Bu yuzden 256x256 varyantlariyla",
+                  "> dogrudan karsilastirilamaz - bkz. bolum 11.2. Karsilastirilabilir",
+                  "> olcutler SPARCS sonuclari ve sahne basina suredir.", "",
+                  "**c050 elendi.** Yari genislikteki omurga diskte 2.6 kat kucuk ve kare",
+                  "basina 1.7 kat hizli, ama INT8 kuantizasyonda cokuyor: kaybedilen",
+                  "kullanilabilir veri %3.563'ten %13.539'a firliyor (FP32 -> INT8), yani",
+                  "3.4 kat daha fazla geri donusu olmayan bilimsel veri kaybi. Ayni hattan",
+                  "c6_tuned neredeyse bedelsiz geciyor (%3.088 -> %4.038). Bu, MobileNetV3",
+                  "bulgusuyla ayni ailede bir sonuc: dar/agresif mimariler egitim sonrasi",
+                  "kuantizasyona direncli.", "",
+                  "Bellek tarafinda kazanc da beklenenden kucuk olurdu: ORT tabani",
+                  "(~9.1 MB olculdu) model kuculunce dusmedigi icin diskteki 2.6 kat",
+                  "kazanc bellege ~%20 olarak yansirdi. c050'nin bellegi ayrica hic",
+                  "olculmedi.", "",
+                  "**c64_tuned elendi.** Farkli sensore hic genellemiyor (SPARCS ROC-AUC",
+                  "0.9644 -> 0.8668) ve sahne basina 5.3 kat yavas.", ""]
+
+    # --- Dagitim yapilandirmalari ---
+    cm = load_json("combined_memory.json")
+    if cm:
+        conf = [
+            ("clf256 + unet64 (DAGITILAN)", "ONERILEN: clf256 + unet64", 3.55, 267,
+             "0.9957", "48.65", "0.475", "29.89"),
+            ("yalniz clf256", "yalniz siniflandirici (256)", 2.59, 92,
+             "0.9957", "48.65", "0.475", "29.89"),
+            ("yalniz unet64", "yalniz U-Net (64)", 0.96, 175,
+             "0.9916", "42.72", "0.787", "0.71"),
+            ("clf64 + unet64", "alternatif: clf64 + unet64", 3.55, 659,
+             "-", "-", "-", "-"),
+        ]
+        rows = []
+        for label, key, disk, ms, prec, az, kayip, kar in conf:
+            rows.append({
+                "yapilandirma": label,
+                "disk MB": disk,
+                "bellek MB (ORT)": cm.get(key, {}).get("toplam_tepe_MB", "-"),
+                "ms/sahne": ms,
+                "precision": prec,
+                "veri azalmasi %": az,
+                "kaybedilen kullanilabilir %": kayip,
+                "SPARCS kar/buz yanlis eleme %": kar,
+            })
+        lines += ["### 6d.2 Dagitim yapilandirmalari", "", df_to_md(pd.DataFrame(rows)), "",
+                  "> Precision / veri azalmasi / kayip sutunlari, her yapilandirmanin KARAR",
+                  "> VEREN modelinin secilen calisma noktasindan gelir: siniflandirici icin",
+                  "> esik 0.7947 (belirsiz bant, precision>=0.995), U-Net icin esik 0.8906",
+                  "> (belirsiz bant, precision>=0.99 - U-Net 0.995'e hicbir esikte",
+                  "> ulasamiyor).", ""]
+
+    lines += [
+        "### 6d.3 Olcut bazinda en iyiler", "",
+        "| olcut | kazanan | deger | not |",
+        "|---|---|---|---|",
+        "| en kucuk disk | yalniz unet64 | 0.96 MB | clf256'nin ucte biri |",
+        "| en dusuk bellek | yalniz unet64 | 14.75 MB | ORT tabani dahil |",
+        "| en kisa sahne suresi | yalniz clf256 | 92 ms | unet64'un yaridan azi |",
+        "| en yuksek precision | clf256 | 0.9957 | U-Net 0.9916'da tikaniyor |",
+        "| en yuksek recall (esit precision hedefinde) | clf256 | 0.8627 | U-Net 0.7773 |",
+        "| en fazla bant genisligi kazanci | clf256 | %48.65 | U-Net %42.72 |",
+        "| en az bilimsel veri kaybi (S2CMC) | clf256 | %0.475 | U-Net %0.787 |",
+        "| **en az veri kaybi (farkli sensor)** | **unet64** | **%0.464** | clf256 %7.95 |",
+        "| **kar/buz dayanikliligi** | **unet64** | **%0.71** | clf256 %29.89 |",
+        "| harici sensor ROC-AUC | unet64 | 0.9733 | clf256 0.9645 |",
+        "| piksel maskesi uretimi | unet64 | var | clf256'da yok |",
+        "",
+        "**Okuma:** siniflandirici EGITIM DAGILIMINDA her verim olcutunde onde;",
+        "U-Net DAGILIM KAYDIGINDA her dayaniklilik olcutunde onde. Tek kazanan",
+        "olmadigi icin ikisi birlikte dagitilir - bu bir uzlasma degil, olculmus bir",
+        "tasarimdir: siniflandirici verimi maksimize eder, U-Net dagilim kaydiginda",
+        "guvenlik agi saglar ve piksel maskesi uretir.", "",
+    ]
+    return "\n".join(lines)
+
+
 def section_literature() -> str:
     """Ilgili calismalar (PDF Gunler 1-3: literatur taramasi)."""
     return "\n".join([
@@ -656,10 +929,10 @@ def section_literature() -> str:
         "| CD-FM3SF | derin ogrenme | IoU 0.8363 |",
         "| Swin-Unet | derin ogrenme (transformer) | F1 0.891 |",
         "| UNetMobV2 | derin ogrenme | CloudSEN12'de en iyi |",
-        "| **bu calisma (U-Net, INT8)** | **derin ogrenme** | **IoU 0.8807, Dice 0.9392** |", "",
+        "| **bu calisma (U-Net 64x64, INT8)** | **derin ogrenme** | **IoU 0.8807, Dice 0.9366** |", "",
         "Rakamlar FARKLI VERI SETLERINDEN gelmektedir; dogrudan karsilastirilamazlar.",
         "Gecerli tek karsilastirma, ayni veri setindeki insan seviyesi referansidir:",
-        "bu calismanin Dice degeri 0.9392, anotatorler arasi uyum 0.9597 - fark 2.05",
+        "bu calismanin Dice degeri 0.9366, anotatorler arasi uyum 0.9597 - fark 2.31",
         "puandir.", "",
         "### 14.4 Hafif mimariler ve kuantizasyon", "",
         "MobileNet ailesi (derinlemesine-ayrilabilir konvolusyonlar) ucta cikarim icin",
@@ -762,9 +1035,10 @@ def section_limitations() -> str:
         "   politika parametresi olarak birakilmistir.",
         "4. **Precision kisiti test setine tasinmiyor.** Dogrulama setinde 0.99 hedefiyle",
         "   secilen esik, daha zor olan test setinde daha dusuk precision veriyor.",
-        "5. **SPARCS karsilastirmasi kotumser.** Landsat-8 icin gunes yuksekligi duzeltmesi",
-        "   uygulanamadi (MTL dosyalari arsivde yok); olculen reflektans kaymasinin bir",
-        "   kismi model basarisizligi degil radyometrik uyumsuzluktur.",
+        "5. ~~SPARCS karsilastirmasi kotumser (gunes yuksekligi duzeltmesi yok).~~",
+        "   **OLCULDU VE ELENDI (bolum 6b.2):** duzeltme uygulandiginda ROC-AUC",
+        "   degismiyor (0.9733 -> 0.9732). Radyometrik uyumsuzluk performans acigini",
+        "   aciklamiyor; acik gercek bir alan kaymasidir. Bu kisit artik gecerli degil.",
         "6. **CloudScout ile dogrudan karsilastirma gecerli degildir:** farkli veri seti,",
         "   farkli gorev esigi (%70), farkli donanim sinifi (1.8 W uzay VPU'su vs masaustu",
         "   CPU) ve farkli girdi boyutu. Boyut olarak ayni sinifta olundugu soylenebilir,",
@@ -774,9 +1048,12 @@ def section_limitations() -> str:
         "2. Coklu tohumlu kosularla model secimini saglamlastirmak.",
         "3. Kar/buz basarisizligi: kar agirlikli karelerle veri artirimi veya kar/buz",
         "   ozel bir kayip agirligi.",
-        "4. Genislik carpani taramasi (mobilenetv2_050 / _075) ile boyut-dogruluk egrisi.",
-        "5. Kismi indirme senaryosu: U-Net maskesiyle bir goruntunun yalnizca temiz",
-        "   bolgelerini indirmek, ikili karardan daha yuksek kazanc saglayabilir.",
+        "4. ~~Genislik carpani taramasi.~~ **Kismen yapildi (bolum 6d.1):** mobilenetv2_050",
+        "   diskte 2.6 kat kucuk ama INT8'de cokuyor (kayip %3.563 -> %13.539). _075",
+        "   denenmedi; QAT ile birlikte denenmesi anlamli olabilir.",
+        "5. ~~Kismi indirme senaryosunun olculmesi.~~ **OLCULDU (bolum 6c):** odunlesim",
+        "   elverissiz cikti (3.28:1). Denenmemis alternatif: bolge-ilgi kodlamasi",
+        "   (JPEG2000 ROI) veya bulutlu bolgeleri atmak yerine kayipli kodlamak.",
         "6. Kuantizasyon-farkinda egitim (QAT) ile MobileNetV3'un da kullanilabilir hale",
         "   getirilmesi.", ""])
 
@@ -813,6 +1090,9 @@ def main():
     parts = [header, section_dataset(), section_models(),
              section_results(args.classifier_tag, args.unet_tag),
              section_downlink(args.classifier_tag), section_external(args.classifier_tag),
+             section_unet_external(args.unet_tag),
+             section_partial_downlink(args.unet_tag),
+             section_tradeoff_matrix(),
              section_quantization(), section_ablation(), section_hparam(),
              section_versions(), section_operating_points(args.classifier_tag),
              section_memory(), section_tiling(), section_classifier_tiling(),

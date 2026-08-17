@@ -1,0 +1,41 @@
+{
+  "model": "outputs\\checkpoints\\c6_tuned_best.pt",
+  "index": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\data\\patches_sparcs\\index.csv",
+  "threshold": 0.5064644813537598,
+  "overall": {
+    "n": 1248,
+    "accuracy": 0.8421474358974359,
+    "precision": 0.59958071278826,
+    "recall": 0.9794520547945206,
+    "f1": 0.7438231469440832,
+    "roc_auc": 0.9644960451653579
+  },
+  "snowy": {
+    "n": 96,
+    "accuracy": 0.46875,
+    "precision": 0.15,
+    "recall": 1.0,
+    "f1": 0.2608695652173913,
+    "roc_auc": 0.8646232439335887,
+    "kari_bulut_sanma_orani": 0.5862068965517241
+  },
+  "non_snowy": {
+    "n": 1152,
+    "accuracy": 0.8732638888888888,
+    "precision": 0.6642685851318945,
+    "recall": 0.9787985865724381,
+    "f1": 0.7914285714285715,
+    "roc_auc": 0.9730977078563964
+  },
+  "downlink": {
+    "test_goruntu_sayisi": 1248,
+    "gercek_bulutlu_orani_%": 23.4,
+    "elenen_goruntu_orani_%": 38.22,
+    "veri_indirme_azalmasi_%": 38.22,
+    "dogru_elenen_bulutlu": 286,
+    "yanlis_elenen_kullanilabilir": 191,
+    "kaybedilen_kullanilabilir_veri_%": 19.979,
+    "kacan_bulutlu_(bosuna_indirilen)": 6,
+    "teorik_ust_sinir_%": 23.4
+  }
+}

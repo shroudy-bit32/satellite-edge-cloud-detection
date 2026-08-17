@@ -1,0 +1,61 @@
+# =============================================================================
+# Uydu Ustu Bulut Tespiti - surum kontrolu disinda tutulanlar
+#
+# Ilke: DEPODA KALAN, sayilarin kaynagi olan seylerdir (olcum ciktilari, surum
+# metadatasi, kod). DISLANAN, indirilebilir veya yeniden uretilebilir olan
+# seylerdir (ham veri, checkpoint'ler, ONNX ikilileri).
+# =============================================================================
+
+# --- Ham veri ---
+# Zenodo (S2CMC, kayit 4172871) ve USGS (SPARCS) uzerinden indirilir.
+# Bkz. README bolum 12, "Veri edinme".
+data/
+datas/
+
+# Indirilen arsivler nereye konursa konsun depoya girmesin (l8cloudmasks.zip
+# 1.5 GB, subscenes.zip + masks.zip birlikte ~26 GB). Dondurulmus surumler
+# GitHub Releases'a elle yuklenir, depoya zip olarak konmaz.
+*.zip
+
+# --- Egitim ve export ciktilari (buyuk, yeniden uretilebilir) ---
+# DIKKAT: outputs/reports/ BILEREK dislanmadi. README ve teknik rapordaki tum
+# sayilarin kaynagi orasi (~5 MB) ve rapor onlardan uretiliyor. Silinirse
+# make_report.py calismaz ve raporlanan hicbir sayi dogrulanamaz.
+outputs/checkpoints/
+outputs/onnx/
+outputs/tensorboard/
+
+# app.py --sample ile uretilen sentetik demo karesi
+outputs/demo_sample.npy
+
+# --- Dondurulmus surumler ---
+# Metadata depoda kalir (MANIFEST.json, README.md, TEKNIK_RAPOR.md,
+# config_snapshot.py ve olcum CSV/JSON'lari - toplam ~0.4 MB); agirliklar
+# GitHub Releases'ta v*.zip olarak dagitilir (~161 MB).
+releases/**/*.pt
+releases/**/*.onnx
+
+# --- ONNX gecici dosyalari ---
+# quant_pre_process / sekil cikarimi bunlari kok dizine birakir.
+# UUID adli .data dosyalari harici agirlik dosyalaridir.
+sym_shape_infer_temp.onnx
+*-*-*-*-*.data
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# --- Editor / IDE / OS ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

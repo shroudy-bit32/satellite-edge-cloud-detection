@@ -1,7 +1,7 @@
 # Uydu Uzerinde Ucta Yapay Zeka ile Bulutlu Goruntulerin Filtrelenmesi
 ## Teknik Rapor
 
-Tarih: 2026-08-03  
+Tarih: 2026-08-17  
 Referans misyon: ESA Phi-Sat-1 / CloudScout
 
 ---
@@ -19,47 +19,6 @@ calistirma kapsam disidir.
 Referans misyon ve ilgili calismalar icin bkz. **bolum 14**.
 
 ## 2. Veri
-
-### 2.1 Sentinel-2 Cloud Mask Catalogue (ana veri seti)
-
-- Kaynak: 513 alt-sahne, 1022x1022 piksel, 20 m cozunurluk, 13 bant
-- Kullanilan bantlar: B02, B03, B04, B08, B10, B11
-- Kare boyutu: 256x256, sahne basina 16 kare
-- Etiketleme kurali: bulut pikseli orani >= %30 ise 'bulutlu'
-- Bulut golgesi ikili gorevde temiz sayildi (SHADOW_AS_CLOUD=False)
-
-**Bolum dagilimi (kare sayisi):**
-
-| split   |   kullanilabilir (0) |   bulutlu (1) |   toplam |
-|:--------|---------------------:|--------------:|---------:|
-| test    |                  421 |           539 |      960 |
-| train   |                 2729 |          3431 |     6160 |
-| val     |                  477 |           611 |     1088 |
-
-**Sahne bazli zorluk (veri setinin kendi 1-5 skalasi):**
-
-| split   |   sahne |   ortalama zorluk |
-|:--------|--------:|------------------:|
-| test    |      60 |              2.65 |
-| train   |     385 |              2.03 |
-| val     |      68 |              2    |
-
-> Bolumleme SAHNE bazlidir, kare bazli degil: ayni sahnenin kareleri
-> birbirine cok benzedigi icin kare bazli bolme test setine sizinti
-> yaratir ve dogrulugu yapay olarak yukseltir.
-
-> Test bolumu, veri setinin README'sinin onerisiyle CALIBRATION + VALIDATION
-> sahnelerinden olusur. Bu sahneler icin anotatorler arasi uyum yayimlanmis
-> oldugundan model performansi insan seviyesiyle karsilastirilabilir.
-> Test setinin ortalama zorlugu egitim setinden yuksektir (tasarim geregi).
-
-### 2.2 SPARCS (harici dogrulama)
-
-- 78 Landsat-8 sahnesi, 1248 kare
-- Bant eslemesi (Sentinel-2 -> Landsat-8): B02->B2, B03->B3, B04->B4, B08->B5, B10->B9, B11->B6
-- Egitimde KULLANILMADI; yalnizca farkli sensore genelleme olcumu icin
-
-> **Uyari:** Gunes yuksekligi duzeltmesi uygulanmadi (MTL dosyalari arsivde yok); Sentinel-2 ile arasinda sistematik reflektans kaymasi bulunur.
 
 ### 2.3 95-Cloud (kapsam disi)
 
@@ -153,6 +112,202 @@ egitiminden alinmis, bu veri uzerinde YENIDEN AYARLANMAMISTIR.
 | kar/buz agirlikli (>%20) |   96 |     0.4688 |      0.15   |   1      | 0.2609 |    0.8646 |                   0.5862 |
 
 > **Basarisizlik modu:** temiz kar/buz karelerinin %58.6'i yanlislikla eleniyor. Kar ve bulut spektral olarak benzer; ayrica Landsat-8 reflektanslarina gunes yuksekligi duzeltmesi uygulanamadigi icin sistematik bir kayma vardir.
+
+## 6b. U-Net'in harici dogrulamasi (SPARCS)
+
+Siniflandiriciya uygulanan harici dogrulamanin aynisi, U-Net maskesinden
+`mask_to_decision` ile goruntu karari uretilerek tekrarlandi. Boylece iki
+model AYNI olcutlerle, ayni veride karsilastirilabiliyor.
+
+| kirilim                  |     n |   accuracy |   precision |   recall |     f1 |   roc_auc |
+|:-------------------------|------:|-----------:|------------:|---------:|-------:|----------:|
+| genel                    | 20480 |     0.9236 |      0.7712 |   0.9523 | 0.8522 |    0.9733 |
+| kar/buz olmayan          | 19116 |     0.922  |      0.7761 |   0.9532 | 0.8556 |    0.9737 |
+| kar/buz agirlikli (>%20) |  1364 |     0.9465 |      0.5897 |   0.9109 | 0.716  |    0.9466 |
+
+**Piksel bazli segmentasyon (ilk kez olculdu):** IoU 0.7225, Dice 0.8389, piksel dogrulugu 0.9312.
+
+Egitim dagiliminda (S2CMC) IoU 0.8892 idi; farkli sensorde 0.167 dusuyor.
+Gercek bir genelleme acigi, ama cokus degil.
+
+### 6b.1 Dogrudan karsilastirma
+
+| olcut                       |   siniflandirici 256px |   U-Net 64px |
+|:----------------------------|-----------------------:|-------------:|
+| ROC-AUC                     |                 0.9645 |       0.9733 |
+| F1                          |                 0.7438 |       0.8522 |
+| veri azalmasi %             |                38.22   |      28.57   |
+| kaybedilen kullanilabilir % |                19.979  |       8.506  |
+| kar/buz yanlis eleme %      |                58.62   |       5.07   |
+
+**Kar/buz yanlis elemesi 11.6 kat aziyor.** Siniflandirici ham bant
+genisligi kazancinda onde, U-Net korunan veri basina kazancta.
+
+**Bu fark karelemeden gelmiyor.** Ayni 64x64 izgarada olculmus
+siniflandirici (`c64_tuned_operating_points.json`) dengeli noktasinda
+kar/buz yanlis elemesini %64.37 veriyor - clf256'nin %58.62'sinden DAHA
+KOTU. Ince kareleme bu sorunu cozmuyor; fark gorev turundendir:
+segmentasyon her pikselde yerel karar verir ve sensorler arasinda en cok
+degisen ozellige (dokusal istatistikler) daha az bagimlidir.
+
+### 6b.2 Negatif sonuc: gunes yuksekligi duzeltmesi yardimci olmuyor
+
+USGS'in `l8cloudmasks.zip` arsivi 80 sahnenin hepsi icin MTL dosyasi
+iceriyor, bu yuzden `1/sin(SUN_ELEVATION)` duzeltmesi uygulanabildi
+(carpan 1.07-2.00, medyan 1.22). Ayni U-Net, iki sette:
+
+| olcut                  |   duzeltmesiz |   duzeltmeli |
+|:-----------------------|--------------:|-------------:|
+| ROC-AUC                |        0.9733 |       0.9732 |
+| precision              |        0.7712 |       0.7156 |
+| recall                 |        0.9523 |       0.9728 |
+| F1                     |        0.8522 |       0.8246 |
+| IoU                    |        0.7225 |       0.6936 |
+| kar/buz yanlis eleme % |        5.07   |       5.86   |
+
+**ROC-AUC pratikte degismiyor.** Bu belirleyici: duzeltme modelin ayirt
+etme yetenegine hicbir sey katmiyor. Yaptigi tek sey goruntuleri ~1.22 kat
+parlatarak sabit esigin skor dagilimi uzerindeki yerini kaydirmak - recall
+yukseliyor, precision dusuyor. Bilgi kazanci degil, esik kaymasi.
+
+Sonuc: **radyometrik uyumsuzluk SPARCS'taki performans acigini
+aciklamiyor.** Acik gercek bir alan kaymasidir (spektral tepki farklari,
+farkli yuzey ortusu, farkli cografya) ve olcek duzeltmesiyle kapanmiyor.
+Raporun onceki 'SPARCS karsilastirmasi kotumser' cekincesi bu olcumle
+ELENMISTIR.
+
+## 6c. Kismi indirme odunlesimi (olculdu)
+
+Ikili karar bir kareyi ya tamamen indirir ya tamamen atar; dogru sekilde
+atilan bulutlu karelerin icindeki temiz pikseller de kaybolur. Bu bir hata
+degil, yontemin YAPISAL maliyetidir ve ikili siniflandiriciyla kapatilamaz.
+U-Net maskesi hangi bolgenin temiz oldugunu bildirdigi icin, kareyi daha
+kucuk bloklara bolup yalnizca temiz bloklari indirmek mumkun.
+
+Karar TAHMIN EDILEN maskeden verilir (uyduda olan bilgi budur), kayip
+muhasebesi GERCEK maskeden yapilir. Her blok BAGIMSIZ bir iletim birimi
+olarak sikistirilir; blok haritasi da maliyete eklenir. `blok = 64x64`
+satiri mevcut ikili davranistir.
+
+Test bolumu, 15,360 kare:
+
+| blok   |   indirilen_alan_% |   kaybedilen_temiz_alan_% |   veri_azalmasi_bayt_% |   bayt_referansa_gore |
+|:-------|-------------------:|--------------------------:|-----------------------:|----------------------:|
+| 64x64  |              48.58 |                     8.13  |                  52.5  |                1      |
+| 32x32  |              49.17 |                     6.517 |                  50.28 |                1.0468 |
+| 16x16  |              49.82 |                     5.096 |                  46.51 |                1.1262 |
+| 8x8    |              50.46 |                     4.001 |                  38.97 |                1.285  |
+
+**Negatif sonuc: odunlesim elverissiz.** Blogu 8x8'e kadar kucultmek yapisal
+kaybin yarisini kurtariyor ama bant genisligi kazancini 13.5 puan dusuruyor.
+Marjinal oran her adimda kotulesiyor:
+
+| adim     |   kurtarilan temiz alan (puan) |   kaybedilen bant genisligi kazanci (puan) | oran     |
+|:---------|-------------------------------:|-------------------------------------------:|:---------|
+| 64 -> 32 |                           1.61 |                                      -2.22 | 1.38 : 1 |
+| 64 -> 16 |                           3.03 |                                      -5.99 | 1.97 : 1 |
+| 64 -> 8  |                           4.13 |                                     -13.53 | 3.28 : 1 |
+
+**Neden:** iki etken ters yonde calisiyor.
+
+1. **Kurtarilan alan kucuk.** Indirilen alan yalnizca %48.58'den %50.46'ya
+   cikiyor. Sebep, U-Net maskelerinin MEKANSAL OLARAK TUTARLI olmasi: %30'dan
+   fazla bulutlu bir kare genellikle buyuk olcude bulutludur, satranc tahtasi
+   degil. Ince bolme kurtarilacak fazla temiz ada bulamiyor.
+2. **Parcalama sikistirmayi bozuyor.** Yuk 225.9 MB'dan 290.2 MB'a cikiyor
+   (+%28). Kucuk bloklar bagimsiz sikistirildiginda baglam kaybediyor.
+
+Blok haritasi maliyeti ihmal edilebilir cikti (en kotu durumda 122 KB, yukun
+%0.04'u). Yani kismi indirmenin maliyeti 'koordinat/metadata yuku' DEGIL,
+parcalanmanin kendisidir. Bu, tahminle bilinemezdi; gercekten sikistirip
+bayt saymak gerekiyordu.
+
+> **Kodek cekincesi:** sikistirma vekili zlib level 6 (VEKIL - gercek misyon CCSDS 122/JPEG2000 kullanir).
+> Mutlak bayt sayilari gercek misyonu temsil etmez; ancak karsilastirma tek
+> kodekle yapildigi icin olculen sey - blok boyutunun sikistirmaya etkisi -
+> gecerlidir.
+
+**Sonucun siniri:** bu, blok tabanli bir protokolun ve genel amacli bir
+kodegin sonucudur; kismi indirme fikrinin tumden reddi degildir. Bolge-ilgi
+kodlamasi (JPEG2000 ROI) ya da bulutlu bolgeleri atmak yerine kayipli
+kodlamak, parcalanma cezasini odemeden ayni kazanci verebilir. Denenmemistir.
+
+**U-Net'in gerekcesi bu olcumle degisiyor.** Kismi indirme, U-Net'i projede
+tutmanin ana gerekcesi olarak gosterilmisti; olcum bunu desteklemiyor. Buna
+karsilik bolum 6b daha guclu ve olculmus bir gerekce sagliyor: farkli
+sensorde dayaniklilik. Gerekce spekulatif olandan olculmus olana kaymistir.
+
+## 6d. Varyantlar arasi odunlesim matrisi
+
+Bu bolum, uretilen tum varyantlari ayni tabloda karsilastirir. Hicbiri her
+olcutte kazanmiyor - secim, hangi kisitin bagladigina baglidir.
+
+### 6d.1 Siniflandirici varyantlari
+
+| varyant   | omurga          | kare    |   INT8 disk MB |   INT8 F1 |   ms/kare |   INT8 kayip % |
+|:----------|:----------------|:--------|---------------:|----------:|----------:|---------------:|
+| c6_tuned  | mobilenetv2_100 | 256x256 |           2.59 |    0.9598 |      5.76 |          4.038 |
+| c050      | mobilenetv2_050 | 256x256 |           1.01 |    0.9329 |      3.38 |         13.539 |
+| c64_tuned | mobilenetv2_100 | 64x64   |           2.59 |    0.9329 |      1.89 |          5.079 |
+
+> **Karsilastirma uyarisi:** c64_tuned'un F1 ve kayip degerleri 64x64
+> karelerde olculmustur; kare boyutu degisince ETIKET TANIMI da degisir
+> (bulut orani hangi pencerede olculuyor). Bu yuzden 256x256 varyantlariyla
+> dogrudan karsilastirilamaz - bkz. bolum 11.2. Karsilastirilabilir
+> olcutler SPARCS sonuclari ve sahne basina suredir.
+
+**c050 elendi.** Yari genislikteki omurga diskte 2.6 kat kucuk ve kare
+basina 1.7 kat hizli, ama INT8 kuantizasyonda cokuyor: kaybedilen
+kullanilabilir veri %3.563'ten %13.539'a firliyor (FP32 -> INT8), yani
+3.4 kat daha fazla geri donusu olmayan bilimsel veri kaybi. Ayni hattan
+c6_tuned neredeyse bedelsiz geciyor (%3.088 -> %4.038). Bu, MobileNetV3
+bulgusuyla ayni ailede bir sonuc: dar/agresif mimariler egitim sonrasi
+kuantizasyona direncli.
+
+Bellek tarafinda kazanc da beklenenden kucuk olurdu: ORT tabani
+(~9.1 MB olculdu) model kuculunce dusmedigi icin diskteki 2.6 kat
+kazanc bellege ~%20 olarak yansirdi. c050'nin bellegi ayrica hic
+olculmedi.
+
+**c64_tuned elendi.** Farkli sensore hic genellemiyor (SPARCS ROC-AUC
+0.9644 -> 0.8668) ve sahne basina 5.3 kat yavas.
+
+### 6d.2 Dagitim yapilandirmalari
+
+| yapilandirma                |   disk MB |   bellek MB (ORT) |   ms/sahne | precision   | veri azalmasi %   | kaybedilen kullanilabilir %   | SPARCS kar/buz yanlis eleme %   |
+|:----------------------------|----------:|------------------:|-----------:|:------------|:------------------|:------------------------------|:--------------------------------|
+| clf256 + unet64 (DAGITILAN) |      3.55 |             27.78 |        267 | 0.9957      | 48.65             | 0.475                         | 29.89                           |
+| yalniz clf256               |      2.59 |             22.14 |         92 | 0.9957      | 48.65             | 0.475                         | 29.89                           |
+| yalniz unet64               |      0.96 |             14.75 |        175 | 0.9916      | 42.72             | 0.787                         | 0.71                            |
+| clf64 + unet64              |      3.55 |             20.83 |        659 | -           | -                 | -                             | -                               |
+
+> Precision / veri azalmasi / kayip sutunlari, her yapilandirmanin KARAR
+> VEREN modelinin secilen calisma noktasindan gelir: siniflandirici icin
+> esik 0.7947 (belirsiz bant, precision>=0.995), U-Net icin esik 0.8906
+> (belirsiz bant, precision>=0.99 - U-Net 0.995'e hicbir esikte
+> ulasamiyor).
+
+### 6d.3 Olcut bazinda en iyiler
+
+| olcut | kazanan | deger | not |
+|---|---|---|---|
+| en kucuk disk | yalniz unet64 | 0.96 MB | clf256'nin ucte biri |
+| en dusuk bellek | yalniz unet64 | 14.75 MB | ORT tabani dahil |
+| en kisa sahne suresi | yalniz clf256 | 92 ms | unet64'un yaridan azi |
+| en yuksek precision | clf256 | 0.9957 | U-Net 0.9916'da tikaniyor |
+| en yuksek recall (esit precision hedefinde) | clf256 | 0.8627 | U-Net 0.7773 |
+| en fazla bant genisligi kazanci | clf256 | %48.65 | U-Net %42.72 |
+| en az bilimsel veri kaybi (S2CMC) | clf256 | %0.475 | U-Net %0.787 |
+| **en az veri kaybi (farkli sensor)** | **unet64** | **%0.464** | clf256 %7.95 |
+| **kar/buz dayanikliligi** | **unet64** | **%0.71** | clf256 %29.89 |
+| harici sensor ROC-AUC | unet64 | 0.9733 | clf256 0.9645 |
+| piksel maskesi uretimi | unet64 | var | clf256'da yok |
+
+**Okuma:** siniflandirici EGITIM DAGILIMINDA her verim olcutunde onde;
+U-Net DAGILIM KAYDIGINDA her dayaniklilik olcutunde onde. Tek kazanan
+olmadigi icin ikisi birlikte dagitilir - bu bir uzlasma degil, olculmus bir
+tasarimdir: siniflandirici verimi maksimize eder, U-Net dagilim kaydiginda
+guvenlik agi saglar ve piksel maskesi uretir.
 
 ## 7. Kuantizasyon calismasi
 
@@ -434,11 +589,12 @@ sonrakinin olcumune karismasin diye).
 **Bulgular:**
 
 1. **Gercek bellek ihtiyaci, disk boyutunun 10-25 katidir.** INT8 siniflandirici
-   diskte 2.59 MB, calisirken 22.12 MB. Yalnizca dosya boyutuna bakarak bellek
+   diskte 2.59 MB, calisirken 22.14 MB. Yalnizca dosya boyutuna bakarak bellek
    kisiti degerlendirmek yaniltici olur.
 
 2. **U-Net diskte kucuk, bellekte buyuktur.** Siniflandiriciya gore diskte 2.7 kat
-   kucuk (0.96 MB vs 2.59 MB) ama bellekte %22 daha pahali (26.89 MB vs 22.12 MB).
+   kucuk (0.96 MB vs 2.59 MB) ama AYNI 256x256 girdide bellekte daha pahali
+   (26.47 MB vs 22.14 MB, bkz. bolum 13 surum matrisi).
    Sebep mimaridir: segmentasyon decoder'i tam cozunurlukte ara tensorler tasir,
    siniflandirici ise havuzlama ile hizla kuculur. Az parametre, buyuk aktivasyon.
    Dagitim karari bu nedenle kisita baglidir: disk darsa U-Net, RAM darsa
@@ -508,7 +664,7 @@ basarisiz oldu. Ayni hiperparametrelerle 64x64'te egitilen siniflandirici:
 | SPARCS recall (varsayilan esik) | 0.9760    | 0.0034   | 256x256            |
 | sure (ms/kare)                  | 5.76      | 1.89     | 64x64              |
 | sure (ms/sahne)                 | 92        | 484      | 256x256            |
-| bellek                          | 22.12 MB  | 15.74 MB | 64x64              |
+| bellek                          | 22.14 MB  | 15.74 MB | 64x64              |
 
 \* Kare boyutu degisince etiket tanimi da degisir (bulut orani hangi
 pencerede olculuyor), bu nedenle S2CMC F1'leri dogrudan karsilastirilamaz.
@@ -611,9 +767,10 @@ aradaki ~9 MB paylasilan calisma zamani tabanidir.
    politika parametresi olarak birakilmistir.
 4. **Precision kisiti test setine tasinmiyor.** Dogrulama setinde 0.99 hedefiyle
    secilen esik, daha zor olan test setinde daha dusuk precision veriyor.
-5. **SPARCS karsilastirmasi kotumser.** Landsat-8 icin gunes yuksekligi duzeltmesi
-   uygulanamadi (MTL dosyalari arsivde yok); olculen reflektans kaymasinin bir
-   kismi model basarisizligi degil radyometrik uyumsuzluktur.
+5. ~~SPARCS karsilastirmasi kotumser (gunes yuksekligi duzeltmesi yok).~~
+   **OLCULDU VE ELENDI (bolum 6b.2):** duzeltme uygulandiginda ROC-AUC
+   degismiyor (0.9733 -> 0.9732). Radyometrik uyumsuzluk performans acigini
+   aciklamiyor; acik gercek bir alan kaymasidir. Bu kisit artik gecerli degil.
 6. **CloudScout ile dogrudan karsilastirma gecerli degildir:** farkli veri seti,
    farkli gorev esigi (%70), farkli donanim sinifi (1.8 W uzay VPU'su vs masaustu
    CPU) ve farkli girdi boyutu. Boyut olarak ayni sinifta olundugu soylenebilir,
@@ -625,9 +782,12 @@ aradaki ~9 MB paylasilan calisma zamani tabanidir.
 2. Coklu tohumlu kosularla model secimini saglamlastirmak.
 3. Kar/buz basarisizligi: kar agirlikli karelerle veri artirimi veya kar/buz
    ozel bir kayip agirligi.
-4. Genislik carpani taramasi (mobilenetv2_050 / _075) ile boyut-dogruluk egrisi.
-5. Kismi indirme senaryosu: U-Net maskesiyle bir goruntunun yalnizca temiz
-   bolgelerini indirmek, ikili karardan daha yuksek kazanc saglayabilir.
+4. ~~Genislik carpani taramasi.~~ **Kismen yapildi (bolum 6d.1):** mobilenetv2_050
+   diskte 2.6 kat kucuk ama INT8'de cokuyor (kayip %3.563 -> %13.539). _075
+   denenmedi; QAT ile birlikte denenmesi anlamli olabilir.
+5. ~~Kismi indirme senaryosunun olculmesi.~~ **OLCULDU (bolum 6c):** odunlesim
+   elverissiz cikti (3.28:1). Denenmemis alternatif: bolge-ilgi kodlamasi
+   (JPEG2000 ROI) veya bulutlu bolgeleri atmak yerine kayipli kodlamak.
 6. Kuantizasyon-farkinda egitim (QAT) ile MobileNetV3'un da kullanilabilir hale
    getirilmesi.
 
@@ -728,11 +888,11 @@ zemini olarak dikkate degerdir.
 | CD-FM3SF | derin ogrenme | IoU 0.8363 |
 | Swin-Unet | derin ogrenme (transformer) | F1 0.891 |
 | UNetMobV2 | derin ogrenme | CloudSEN12'de en iyi |
-| **bu calisma (U-Net, INT8)** | **derin ogrenme** | **IoU 0.8807, Dice 0.9392** |
+| **bu calisma (U-Net 64x64, INT8)** | **derin ogrenme** | **IoU 0.8807, Dice 0.9366** |
 
 Rakamlar FARKLI VERI SETLERINDEN gelmektedir; dogrudan karsilastirilamazlar.
 Gecerli tek karsilastirma, ayni veri setindeki insan seviyesi referansidir:
-bu calismanin Dice degeri 0.9392, anotatorler arasi uyum 0.9597 - fark 2.05
+bu calismanin Dice degeri 0.9366, anotatorler arasi uyum 0.9597 - fark 2.31
 puandir.
 
 ### 14.4 Hafif mimariler ve kuantizasyon

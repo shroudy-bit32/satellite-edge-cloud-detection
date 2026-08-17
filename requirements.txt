@@ -1,5 +1,7 @@
-# PyTorch BU DOSYADA YOK — ayrı index'ten kurulur (zaten kurulu):
-#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+# PyTorch BU DOSYADA YOK — ayrı index'ten kurulur.
+# GPU gerekmez: tüm ölçümler tek iş parçacıklı CPU'da yapılır (bkz. README bölüm 4).
+#   CPU  : pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#   CUDA : pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 
 # --- Çekirdek ---
 numpy
@@ -19,6 +21,8 @@ opencv-python-headless   # albumentations bunu istiyor; GUI'li opencv-python ile
 timm              # MobileNetV3/V4 omurgaları
 torchmetrics
 scikit-learn      # precision / recall / F1 / confusion matrix
+tabulate          # pandas .to_markdown() — make_report.py rapor tablolarını bununla üretir
+python-docx       # md_to_docx.py — teknik raporun .docx sürümünü üretir
 albumentations    # veri artırma
 
 # --- Deney takibi ---

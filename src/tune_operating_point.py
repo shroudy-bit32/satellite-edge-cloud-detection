@@ -12,7 +12,17 @@ kodda sabit degil, modelle birlikte tasinan ve yerden guncellenebilir bir
 parametre.
 
 Kullanim:
+    # Siniflandirici: skor = bulutlu olasiligi
     python -m src.tune_operating_point --checkpoint outputs/checkpoints/c6_tuned_best.pt --tag c6_tuned
+
+    # U-Net: skor = maskeden hesaplanan bulut pikseli orani
+    CLOUD_PATCH_SIZE=64 CLOUD_PATCH_DIR=data/patches_t64 \
+      python -m src.tune_operating_point --task segmentation \
+      --checkpoint outputs/checkpoints/unet_t64_best.pt --tag unet_t64
+
+Segmentasyon gorevinde tek fark skorun nereden geldigidir; esik arama, belirsiz
+bant tanimi ve degerlendirme aynidir. Boylece iki model AYNI yontemle secilmis
+calisma noktalarinda karsilastirilabilir.
 """
 
 import argparse
@@ -29,42 +39,68 @@ from src.export import load_from_checkpoint
 
 
 @torch.no_grad()
-def predict(checkpoint: Path, index: pd.DataFrame, batch_size: int = 64) -> np.ndarray:
-    model, task = load_from_checkpoint(checkpoint)
-    if task != "classification":
-        raise SystemExit("siniflandirici checkpoint'i gerekli")
+def predict(checkpoint: Path, index: pd.DataFrame, batch_size: int = 64,
+            task: str = "classification", pixel_threshold: float = 0.5) -> np.ndarray:
+    """Her kare icin [0,1] araliginda bir KARAR SKORU dondurur.
+
+    Siniflandirici: bulutlu olma olasiligi.
+    U-Net: maskeden hesaplanan bulut pikseli orani (unet.mask_to_decision ile
+    ayni mantik). Ikisi de esikle karsilastirilip ikili karara cevrildigi icin
+    tune() / assess() gorev ayrimi yapmadan calisir.
+    """
+    model, ckpt_task = load_from_checkpoint(checkpoint)
+    if ckpt_task != task:
+        raise SystemExit(f"bu checkpoint '{ckpt_task}' gorevine ait, "
+                         f"'{task}' bekleniyordu (--task ile secilir)")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device).eval()
 
-    probs = []
+    scores = []
     paths = index["path"].tolist()
     for i in range(0, len(paths), batch_size):
         batch = np.stack([np.load(p).astype(np.float32) for p in paths[i:i + batch_size]])
-        probs.append(torch.sigmoid(model(torch.from_numpy(batch).to(device)).squeeze(1)).cpu().numpy())
-    return np.concatenate(probs)
+        out = model(torch.from_numpy(batch).to(device))
+
+        if task == "segmentation":
+            # (B, 1, H, W) logit haritasi -> kare basina bulut pikseli orani
+            mask = (torch.sigmoid(out) >= pixel_threshold).float()
+            scores.append(mask.mean(dim=(-2, -1)).squeeze(1).cpu().numpy())
+        else:
+            scores.append(torch.sigmoid(out.squeeze(1)).cpu().numpy())
+    return np.concatenate(scores)
 
 
-def tune(scores: np.ndarray, targets: np.ndarray, min_precision: float | None) -> float:
-    """min_precision verilirse o kisit altinda recall'u maksimize eder,
-    None verilirse dogrudan en iyi F1'i secer.
+def tune(scores: np.ndarray, targets: np.ndarray,
+         min_precision: float | None) -> tuple[float, bool]:
+    """(esik, kisit_saglandi) dondurur.
+
+    min_precision verilirse o kisit altinda recall'u maksimize eder, None
+    verilirse dogrudan en iyi F1'i secer.
 
     DIKKAT: min_precision=0 GECERLI BIR "en iyi F1" istegi DEGILDIR - her esik
     kisiti saglar, algoritma recall'u maksimize edip tabana iner ve her seyi
     bulutlu ilan eder. Dengeli nokta icin None kullanilmalidir.
+
+    DIKKAT: kisit hicbir esikte saglanamiyorsa en iyi F1'e DUSULUR. Bu geri
+    dusus sessiz kalmamalidir - aksi halde "precision>=0.995" etiketli bir
+    calisma noktasi 0.98 precision raporlar ve okuyan kisi kisitin saglandigini
+    sanir. Ikinci donen deger bu ayrimi tasir; cagiran taraf raporlamalidir.
     """
     precisions, recalls, thresholds = precision_recall_curve(targets, scores)
     precisions, recalls = precisions[:-1], recalls[:-1]
     f1s = 2 * precisions * recalls / np.clip(precisions + recalls, 1e-9, None)
 
     if min_precision is None:
-        idx = int(np.argmax(f1s))
+        idx, met = int(np.argmax(f1s)), True
     else:
         feasible = precisions >= min_precision
-        idx = int(np.argmax(np.where(feasible, recalls, -1.0))) if feasible.any() \
+        met = bool(feasible.any())
+        idx = int(np.argmax(np.where(feasible, recalls, -1.0))) if met \
             else int(np.argmax(f1s))
     t = float(thresholds[idx])
     below = scores[scores < t]
-    return float((t + below.max()) / 2) if below.size else max(t - 1e-6, 0.0)
+    t = float((t + below.max()) / 2) if below.size else max(t - 1e-6, 0.0)
+    return t, met
 
 
 def assess(scores: np.ndarray, targets: np.ndarray, threshold: float) -> dict:
@@ -89,6 +125,10 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--checkpoint", type=Path, required=True)
     p.add_argument("--tag", required=True)
+    p.add_argument("--task", default="classification",
+                   choices=["classification", "segmentation"])
+    p.add_argument("--pixel-threshold", type=float, default=0.5,
+                   help="segmentasyon: maskeyi ikili yapan piksel esigi")
     p.add_argument("--ambiguous-low", type=float, default=0.02)
     p.add_argument("--ambiguous-high", type=float, default=0.98)
     p.add_argument("--sparcs-index", type=Path,
@@ -99,9 +139,11 @@ def main():
     val = index[index["split"] == "val"].reset_index(drop=True)
     test = index[index["split"] == "test"].reset_index(drop=True)
 
-    print("tahminler uretiliyor...")
-    val_scores = predict(args.checkpoint, val)
-    test_scores = predict(args.checkpoint, test)
+    print(f"tahminler uretiliyor ({args.task})...")
+    val_scores = predict(args.checkpoint, val, task=args.task,
+                         pixel_threshold=args.pixel_threshold)
+    test_scores = predict(args.checkpoint, test, task=args.task,
+                          pixel_threshold=args.pixel_threshold)
     y_val = val["label"].to_numpy()
     y_test = test["label"].to_numpy()
 
@@ -112,14 +154,29 @@ def main():
     # --- Calisma noktalari ---
     points = {}
 
-    summary_path = config.REPORTS / f"{args.tag}_train_summary.json"
-    if summary_path.exists():
-        points["mevcut (tum val, precision>=0.99)"] = json.loads(
-            summary_path.read_text(encoding="utf-8"))["threshold"]
+    if args.task == "segmentation":
+        # U-Net egitim ozetinde karar esigi YOKTUR: dagitilan kural, maskedeki
+        # bulut oraninin sabit %30 esigini gecmesidir (config.CLOUD_PIXEL_THRESHOLD).
+        # Referans nokta bu; asagidaki noktalar ona gore kazanc/kayip gosterir.
+        points[f"mevcut (sabit %{100 * config.CLOUD_PIXEL_THRESHOLD:.0f} bulut orani)"] = \
+            config.CLOUD_PIXEL_THRESHOLD
+    else:
+        summary_path = config.REPORTS / f"{args.tag}_train_summary.json"
+        if summary_path.exists():
+            points["mevcut (tum val, precision>=0.99)"] = json.loads(
+                summary_path.read_text(encoding="utf-8"))["threshold"]
 
-    points["belirsiz bant (precision>=0.99)"] = tune(val_scores[amb], y_val[amb], 0.99)
-    points["belirsiz bant (precision>=0.995)"] = tune(val_scores[amb], y_val[amb], 0.995)
-    points["dengeli (tum val, en iyi F1)"] = tune(val_scores, y_val, None)
+    infeasible = set()
+    for name, min_p in [("belirsiz bant (precision>=0.99)", 0.99),
+                        ("belirsiz bant (precision>=0.995)", 0.995)]:
+        points[name], met = tune(val_scores[amb], y_val[amb], min_p)
+        if not met:
+            infeasible.add(name)
+            print(f"UYARI: '{name}' kisiti dogrulama setinin belirsiz bandinda "
+                  f"HICBIR esikte saglanamadi. En iyi F1 noktasina dusuldu; "
+                  f"bu nokta kisiti KARSILAMAZ.")
+
+    points["dengeli (tum val, en iyi F1)"], _ = tune(val_scores, y_val, None)
 
     # --- S2CMC test ---
     rows = []
@@ -135,7 +192,8 @@ def main():
     df_sparcs = None
     if args.sparcs_index.exists():
         sparcs = pd.read_csv(args.sparcs_index)
-        sparcs_scores = predict(args.checkpoint, sparcs)
+        sparcs_scores = predict(args.checkpoint, sparcs, task=args.task,
+                                pixel_threshold=args.pixel_threshold)
         y_sparcs = sparcs["label"].to_numpy()
         snowy = sparcs["snow_fraction"].to_numpy() > 0.2
 
@@ -153,10 +211,13 @@ def main():
         print(f"\nSPARCS ROC-AUC: {roc_auc_score(y_sparcs, sparcs_scores):.4f}")
 
     # --- Kaydet ---
-    out = {"model": str(args.checkpoint), "tag": args.tag,
+    out = {"model": str(args.checkpoint), "tag": args.tag, "task": args.task,
            "ambiguous_band": [args.ambiguous_low, args.ambiguous_high],
            "operating_points": {
                name: {"threshold": round(t, 6),
+                      # False ise: kisit saglanamadi, en iyi F1'e dusuldu.
+                      # Nokta adi kisiti anar ama nokta onu KARSILAMAZ.
+                      "constraint_met": name not in infeasible,
                       "s2cmc_test": assess(test_scores, y_test, t)}
                for name, t in points.items()},
            "note": "Esik kodda sabit degildir; burada tanimli noktalardan biri "

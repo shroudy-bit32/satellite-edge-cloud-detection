@@ -1,0 +1,96 @@
+{
+  "model": "releases/v3.2/unet.pt",
+  "tag": "unet_t64",
+  "task": "segmentation",
+  "ambiguous_band": [
+    0.02,
+    0.98
+  ],
+  "operating_points": {
+    "mevcut (sabit %30 bulut orani)": {
+      "threshold": 0.3,
+      "constraint_met": true,
+      "s2cmc_test": {
+        "accuracy": 0.9476,
+        "precision": 0.979,
+        "recall": 0.9237,
+        "f1": 0.9505,
+        "veri_azalmasi_%": 51.42,
+        "kaybedilen_kullanilabilir_%": 2.375
+      },
+      "sparcs": {
+        "accuracy": 0.9236,
+        "precision": 0.7712,
+        "recall": 0.9523,
+        "f1": 0.8522,
+        "veri_azalmasi_%": 28.57,
+        "kaybedilen_kullanilabilir_%": 8.506,
+        "kar_buz_yanlis_eleme_%": 5.07
+      }
+    },
+    "belirsiz bant (precision>=0.99)": {
+      "threshold": 0.890625,
+      "constraint_met": true,
+      "s2cmc_test": {
+        "accuracy": 0.8751,
+        "precision": 0.9916,
+        "recall": 0.7773,
+        "f1": 0.8715,
+        "veri_azalmasi_%": 42.72,
+        "kaybedilen_kullanilabilir_%": 0.787
+      },
+      "sparcs": {
+        "accuracy": 0.8652,
+        "precision": 0.9656,
+        "recall": 0.4329,
+        "f1": 0.5978,
+        "veri_azalmasi_%": 10.37,
+        "kaybedilen_kullanilabilir_%": 0.464,
+        "kar_buz_yanlis_eleme_%": 0.71
+      }
+    },
+    "belirsiz bant (precision>=0.995)": {
+      "threshold": 0.291138,
+      "constraint_met": false,
+      "s2cmc_test": {
+        "accuracy": 0.9484,
+        "precision": 0.9788,
+        "recall": 0.9255,
+        "f1": 0.9514,
+        "veri_azalmasi_%": 51.53,
+        "kaybedilen_kullanilabilir_%": 2.404
+      },
+      "sparcs": {
+        "accuracy": 0.9193,
+        "precision": 0.7594,
+        "recall": 0.9531,
+        "f1": 0.8453,
+        "veri_azalmasi_%": 29.04,
+        "kaybedilen_kullanilabilir_%": 9.09,
+        "kar_buz_yanlis_eleme_%": 5.07
+      }
+    },
+    "dengeli (tum val, en iyi F1)": {
+      "threshold": 0.291138,
+      "constraint_met": true,
+      "s2cmc_test": {
+        "accuracy": 0.9484,
+        "precision": 0.9788,
+        "recall": 0.9255,
+        "f1": 0.9514,
+        "veri_azalmasi_%": 51.53,
+        "kaybedilen_kullanilabilir_%": 2.404
+      },
+      "sparcs": {
+        "accuracy": 0.9193,
+        "precision": 0.7594,
+        "recall": 0.9531,
+        "f1": 0.8453,
+        "veri_azalmasi_%": 29.04,
+        "kaybedilen_kullanilabilir_%": 9.09,
+        "kar_buz_yanlis_eleme_%": 5.07
+      }
+    }
+  },
+  "note": "Esik kodda sabit degildir; burada tanimli noktalardan biri secilerek kullanilir ve yerden guncellenebilir."
+}

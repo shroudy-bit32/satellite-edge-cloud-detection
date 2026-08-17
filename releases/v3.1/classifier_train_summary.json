@@ -1,0 +1,45 @@
+{
+  "tag": "c6_tuned",
+  "model": "mobilenetv2_100",
+  "epochs": 15,
+  "hyperparameters": {
+    "lr": 0.00119,
+    "weight_decay": 5.7e-05,
+    "batch_size": 64,
+    "label_smoothing": 0.1,
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B10",
+      "B11"
+    ]
+  },
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": true,
+    "ema_decay": 0.99,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.9742310889443059,
+  "threshold": 0.5064644813537598,
+  "threshold_tuning": {
+    "threshold": 0.5064644813537598,
+    "precision": 0.9915397631133672,
+    "recall": 0.9590834697217676,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.95625,
+    "precision": 0.9751434034416826,
+    "recall": 0.9461966604823747,
+    "f1": 0.96045197740113,
+    "roc_auc": 0.9882601280633178,
+    "ap": 0.9921402232161877
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\c6_tuned_best.pt"
+}

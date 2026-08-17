@@ -1,0 +1,31 @@
+{
+  "tag": "v2",
+  "model": "mobilenetv2_100",
+  "epochs": 15,
+  "optimizations": {
+    "balanced_sampling": false,
+    "warmup_epochs": 2,
+    "ema": false,
+    "ema_decay": null,
+    "accum_steps": 1,
+    "effective_batch": 64,
+    "clip_grad": 0.0
+  },
+  "best_val_f1": 0.9627174813587407,
+  "threshold": 0.9266390800476074,
+  "threshold_tuning": {
+    "threshold": 0.9266390800476074,
+    "precision": 0.9910554561717353,
+    "recall": 0.9067103109656302,
+    "constraint_met": true
+  },
+  "test": {
+    "accuracy": 0.9302083333333333,
+    "precision": 0.9896265560165975,
+    "recall": 0.8849721706864564,
+    "f1": 0.9343780607247796,
+    "roc_auc": 0.9809667766912423,
+    "ap": 0.9876329488199074
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\v2_best.pt"
+}

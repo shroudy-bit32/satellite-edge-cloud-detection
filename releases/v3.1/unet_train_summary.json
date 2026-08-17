@@ -1,0 +1,36 @@
+{
+  "tag": "unet_t128",
+  "task": "segmentation",
+  "encoder": "mobilenetv2_050",
+  "parameters": 540249,
+  "best_val_iou": 0.9409016808290341,
+  "test": {
+    "iou": 0.8856397189678978,
+    "dice": 0.9393519982201599,
+    "precision": 0.9431571620964636,
+    "recall": 0.9355774148046138,
+    "pixel_accuracy": 0.9374334971110012,
+    "image_level_accuracy": 0.9447916666666667
+  },
+  "hyperparameters": {
+    "lr": 0.001128,
+    "weight_decay": 0.001394,
+    "batch_size": 32,
+    "bce_weight": 0.3,
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B10",
+      "B11"
+    ]
+  },
+  "optimizations": {
+    "accum_steps": 1,
+    "effective_batch": 32,
+    "clip_grad": 0.0,
+    "bce_weight": 0.3
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\unet_t128_best.pt"
+}

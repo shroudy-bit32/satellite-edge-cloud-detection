@@ -110,9 +110,10 @@ class CloudClassifier:
         if self._cam is None:
             from pytorch_grad_cam import GradCAM
 
-            # MobileNetV3'te son evrisim blogu: mekansal bilgiyi tasiyan en
-            # derin katman. Daha derini (conv_head sonrasi) global havuzlama
-            # nedeniyle mekansal cozunurlugu kaybeder.
+            # timm'in MobileNet ailesinde (V2/V3) son evrisim blogu: mekansal
+            # bilgiyi tasiyan en derin katman. Daha derini (conv_head sonrasi)
+            # global havuzlama nedeniyle mekansal cozunurlugu kaybeder.
+            # Dagitilan model mobilenetv2_100'dur; .blocks her iki mimaride var.
             target_layers = [self.model.blocks[-1]]
             self._cam = GradCAM(model=self.model, target_layers=target_layers)
         return self._cam

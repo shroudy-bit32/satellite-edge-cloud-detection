@@ -1,0 +1,36 @@
+{
+  "tag": "unet_t64",
+  "task": "segmentation",
+  "encoder": "mobilenetv2_050",
+  "parameters": 540249,
+  "best_val_iou": 0.924131365891086,
+  "test": {
+    "iou": 0.8895546763967149,
+    "dice": 0.9415495486937173,
+    "precision": 0.9697360414713458,
+    "recall": 0.9149553205415183,
+    "pixel_accuracy": 0.9411652882893866,
+    "image_level_accuracy": 0.9479817708333333
+  },
+  "hyperparameters": {
+    "lr": 0.001128,
+    "weight_decay": 0.001394,
+    "batch_size": 32,
+    "bce_weight": 0.3,
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B10",
+      "B11"
+    ]
+  },
+  "optimizations": {
+    "accum_steps": 1,
+    "effective_batch": 32,
+    "clip_grad": 0.0,
+    "bce_weight": 0.3
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\unet_t64_best.pt"
+}

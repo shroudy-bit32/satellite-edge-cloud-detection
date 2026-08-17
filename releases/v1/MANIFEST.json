@@ -1,0 +1,161 @@
+{
+  "version": "v1",
+  "created": "2026-07-31 17:53",
+  "note": "MobileNetV2 tabanli ilk calisan surum: siniflandirici + U-Net, INT8 kuantizasyon calisiyor, SPARCS harici dogrulama tamam.",
+  "classifier": {
+    "backbone": "mobilenetv2_100",
+    "threshold": 0.9266390800476074,
+    "test": {
+      "accuracy": 0.9302083333333333,
+      "precision": 0.9896265560165975,
+      "recall": 0.8849721706864564,
+      "f1": 0.9343780607247796,
+      "roc_auc": 0.9809667766912423,
+      "ap": 0.9876329488199074
+    }
+  },
+  "unet": {
+    "encoder": "mobilenetv2_100",
+    "test": {
+      "iou": 0.8746141069202958,
+      "dice": 0.9331137578572403,
+      "precision": 0.9358111881553233,
+      "recall": 0.9304318332882866,
+      "pixel_accuracy": 0.9309270381927476,
+      "image_level_accuracy": 0.9479166666666666
+    }
+  },
+  "downlink": {
+    "PyTorch FP32": {
+      "test_goruntu_sayisi": 960,
+      "gercek_bulutlu_orani_%": 56.15,
+      "elenen_goruntu_orani_%": 50.21,
+      "veri_indirme_azalmasi_%": 50.21,
+      "dogru_elenen_bulutlu": 477,
+      "yanlis_elenen_kullanilabilir": 5,
+      "kaybedilen_kullanilabilir_veri_%": 1.188,
+      "kacan_bulutlu_(bosuna_indirilen)": 62,
+      "teorik_ust_sinir_%": 56.15
+    },
+    "ONNX FP32": {
+      "test_goruntu_sayisi": 960,
+      "gercek_bulutlu_orani_%": 56.15,
+      "elenen_goruntu_orani_%": 50.21,
+      "veri_indirme_azalmasi_%": 50.21,
+      "dogru_elenen_bulutlu": 477,
+      "yanlis_elenen_kullanilabilir": 5,
+      "kaybedilen_kullanilabilir_veri_%": 1.188,
+      "kacan_bulutlu_(bosuna_indirilen)": 62,
+      "teorik_ust_sinir_%": 56.15
+    },
+    "ONNX INT8": {
+      "test_goruntu_sayisi": 960,
+      "gercek_bulutlu_orani_%": 56.15,
+      "elenen_goruntu_orani_%": 50.73,
+      "veri_indirme_azalmasi_%": 50.73,
+      "dogru_elenen_bulutlu": 480,
+      "yanlis_elenen_kullanilabilir": 7,
+      "kaybedilen_kullanilabilir_veri_%": 1.663,
+      "kacan_bulutlu_(bosuna_indirilen)": 59,
+      "teorik_ust_sinir_%": 56.15
+    }
+  },
+  "external_sparcs": {
+    "overall": {
+      "n": 1248,
+      "accuracy": 0.9078525641025641,
+      "precision": 0.7595307917888563,
+      "recall": 0.886986301369863,
+      "f1": 0.8183254344391785,
+      "roc_auc": 0.9584993122026709
+    },
+    "snowy": {
+      "n": 96,
+      "accuracy": 0.7395833333333334,
+      "precision": 0.2647058823529412,
+      "recall": 1.0,
+      "f1": 0.4186046511627907,
+      "roc_auc": 0.8939974457215836,
+      "kari_bulut_sanma_orani": 0.28735632183908044
+    },
+    "non_snowy": {
+      "n": 1152,
+      "accuracy": 0.921875,
+      "precision": 0.8143322475570033,
+      "recall": 0.8833922261484098,
+      "f1": 0.847457627118644,
+      "roc_auc": 0.9658069264456526
+    }
+  },
+  "data": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B10",
+      "B11"
+    ],
+    "patch_size": 256,
+    "cloud_pixel_threshold": 0.3,
+    "reflectance_clip": 1.2
+  },
+  "files": [
+    {
+      "name": "classifier.pt",
+      "MB": 8.726
+    },
+    {
+      "name": "unet.pt",
+      "MB": 7.51
+    },
+    {
+      "name": "classifier_fp32.onnx",
+      "MB": 8.656
+    },
+    {
+      "name": "classifier_int8.onnx",
+      "MB": 2.586
+    },
+    {
+      "name": "unet_fp32.onnx",
+      "MB": 7.494
+    },
+    {
+      "name": "unet_int8.onnx",
+      "MB": 2.365
+    },
+    {
+      "name": "classifier_train_summary.json",
+      "MB": 0.001
+    },
+    {
+      "name": "unet_train_summary.json",
+      "MB": 0.001
+    },
+    {
+      "name": "classifier_benchmark.csv",
+      "MB": 0.001
+    },
+    {
+      "name": "unet_benchmark.csv",
+      "MB": 0.0
+    },
+    {
+      "name": "downlink_analysis.json",
+      "MB": 0.001
+    },
+    {
+      "name": "external_sparcs.json",
+      "MB": 0.001
+    },
+    {
+      "name": "TEKNIK_RAPOR.md",
+      "MB": 0.018
+    },
+    {
+      "name": "config_snapshot.py",
+      "MB": 0.005
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "tag": "unet050",
+  "task": "segmentation",
+  "encoder": "mobilenetv2_050",
+  "parameters": 540249,
+  "best_val_iou": 0.9290839286227339,
+  "test": {
+    "iou": 0.8844141528535376,
+    "dice": 0.9386621847583597,
+    "precision": 0.940618209674731,
+    "recall": 0.9367142781064851,
+    "pixel_accuracy": 0.936606105168659,
+    "image_level_accuracy": 0.9510416666666667
+  },
+  "optimizations": {
+    "accum_steps": 1,
+    "effective_batch": 16,
+    "clip_grad": 0.0,
+    "bce_weight": 0.5
+  },
+  "checkpoint": "C:\\Users\\Cemil\\PycharmProjects\\InternProject\\outputs\\checkpoints\\unet050_best.pt"
+}

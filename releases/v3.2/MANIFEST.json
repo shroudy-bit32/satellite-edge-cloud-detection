@@ -1,0 +1,207 @@
+{
+  "version": "v3.2",
+  "created": "2026-08-02 21:02",
+  "note": "v3 + 64x64 karelemeli U-Net. Aktivasyon bellegi 15.81 -> 4.08 MB (3.9x az), toplam model maliyeti 26.72 -> 14.87 MB. IoU maliyeti 0.0037, sahne suresi %36 fazla. Siniflandirici degismedi.",
+  "source_tags": {
+    "classifier": "c6_tuned",
+    "unet": "unet_t64"
+  },
+  "hyperparameters": {
+    "lr": 0.00119,
+    "weight_decay": 5.7e-05,
+    "batch_size": 64,
+    "label_smoothing": 0.1,
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B10",
+      "B11"
+    ]
+  },
+  "classifier": {
+    "backbone": "mobilenetv2_100",
+    "threshold": 0.5064644813537598,
+    "test": {
+      "accuracy": 0.95625,
+      "precision": 0.9751434034416826,
+      "recall": 0.9461966604823747,
+      "f1": 0.96045197740113,
+      "roc_auc": 0.9882601280633178,
+      "ap": 0.9921402232161877
+    }
+  },
+  "unet": {
+    "encoder": "mobilenetv2_050",
+    "test": {
+      "iou": 0.8895546763967149,
+      "dice": 0.9415495486937173,
+      "precision": 0.9697360414713458,
+      "recall": 0.9149553205415183,
+      "pixel_accuracy": 0.9411652882893866,
+      "image_level_accuracy": 0.9479817708333333
+    }
+  },
+  "downlink": {
+    "PyTorch FP32": {
+      "test_goruntu_sayisi": 960,
+      "gercek_bulutlu_orani_%": 56.15,
+      "elenen_goruntu_orani_%": 54.48,
+      "veri_indirme_azalmasi_%": 54.48,
+      "dogru_elenen_bulutlu": 510,
+      "yanlis_elenen_kullanilabilir": 13,
+      "kaybedilen_kullanilabilir_veri_%": 3.088,
+      "kacan_bulutlu_(bosuna_indirilen)": 29,
+      "teorik_ust_sinir_%": 56.15
+    },
+    "ONNX FP32": {
+      "test_goruntu_sayisi": 960,
+      "gercek_bulutlu_orani_%": 56.15,
+      "elenen_goruntu_orani_%": 54.48,
+      "veri_indirme_azalmasi_%": 54.48,
+      "dogru_elenen_bulutlu": 510,
+      "yanlis_elenen_kullanilabilir": 13,
+      "kaybedilen_kullanilabilir_veri_%": 3.088,
+      "kacan_bulutlu_(bosuna_indirilen)": 29,
+      "teorik_ust_sinir_%": 56.15
+    },
+    "ONNX INT8": {
+      "test_goruntu_sayisi": 960,
+      "gercek_bulutlu_orani_%": 56.15,
+      "elenen_goruntu_orani_%": 55.21,
+      "veri_indirme_azalmasi_%": 55.21,
+      "dogru_elenen_bulutlu": 513,
+      "yanlis_elenen_kullanilabilir": 17,
+      "kaybedilen_kullanilabilir_veri_%": 4.038,
+      "kacan_bulutlu_(bosuna_indirilen)": 26,
+      "teorik_ust_sinir_%": 56.15
+    }
+  },
+  "external_sparcs": {
+    "overall": {
+      "n": 1248,
+      "accuracy": 0.8421474358974359,
+      "precision": 0.59958071278826,
+      "recall": 0.9794520547945206,
+      "f1": 0.7438231469440832,
+      "roc_auc": 0.9644960451653579
+    },
+    "snowy": {
+      "n": 96,
+      "accuracy": 0.46875,
+      "precision": 0.15,
+      "recall": 1.0,
+      "f1": 0.2608695652173913,
+      "roc_auc": 0.8646232439335887,
+      "kari_bulut_sanma_orani": 0.5862068965517241
+    },
+    "non_snowy": {
+      "n": 1152,
+      "accuracy": 0.8732638888888888,
+      "precision": 0.6642685851318945,
+      "recall": 0.9787985865724381,
+      "f1": 0.7914285714285715,
+      "roc_auc": 0.9730977078563964
+    }
+  },
+  "data": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B10",
+      "B11"
+    ],
+    "patch_size": 256,
+    "cloud_pixel_threshold": 0.3,
+    "reflectance_clip": 1.2
+  },
+  "files": [
+    {
+      "name": "classifier.pt",
+      "MB": 8.728
+    },
+    {
+      "name": "unet.pt",
+      "MB": 2.277
+    },
+    {
+      "name": "classifier_fp32.onnx",
+      "MB": 8.656
+    },
+    {
+      "name": "classifier_int8.onnx",
+      "MB": 2.586
+    },
+    {
+      "name": "unet_fp32.onnx",
+      "MB": 2.351
+    },
+    {
+      "name": "unet_int8.onnx",
+      "MB": 0.957
+    },
+    {
+      "name": "classifier_train_summary.json",
+      "MB": 0.001
+    },
+    {
+      "name": "unet_train_summary.json",
+      "MB": 0.001
+    },
+    {
+      "name": "classifier_benchmark.csv",
+      "MB": 0.0
+    },
+    {
+      "name": "unet_benchmark.csv",
+      "MB": 0.0
+    },
+    {
+      "name": "downlink_analysis.json",
+      "MB": 0.001
+    },
+    {
+      "name": "external_sparcs.json",
+      "MB": 0.001
+    },
+    {
+      "name": "tag_analysis.csv",
+      "MB": 0.002
+    },
+    {
+      "name": "threshold_analysis.csv",
+      "MB": 0.0
+    },
+    {
+      "name": "decision_layer.csv",
+      "MB": 0.0
+    },
+    {
+      "name": "operating_points.json",
+      "MB": 0.002
+    },
+    {
+      "name": "memory_profile.csv",
+      "MB": 0.0
+    },
+    {
+      "name": "tiling_tradeoff.csv",
+      "MB": 0.0
+    },
+    {
+      "name": "tiling_latency_clean.csv",
+      "MB": 0.0
+    },
+    {
+      "name": "TEKNIK_RAPOR.md",
+      "MB": 0.032
+    },
+    {
+      "name": "config_snapshot.py",
+      "MB": 0.006
+    }
+  ]
+}

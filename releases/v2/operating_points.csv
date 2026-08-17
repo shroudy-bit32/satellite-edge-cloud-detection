@@ -1,0 +1,5 @@
+calisma noktasi,esik,accuracy,precision,recall,f1,veri_azalmasi_%,kaybedilen_kullanilabilir_%
+"mevcut (tum val, precision>=0.99)",0.5065,0.9563,0.9751,0.9462,0.9605,54.48,3.088
+belirsiz bant (precision>=0.99),0.7181,0.9396,0.9898,0.9017,0.9437,51.15,1.188
+belirsiz bant (precision>=0.995),0.7947,0.9208,0.9957,0.8627,0.9245,48.65,0.475
+"dengeli (tum val, en iyi F1)",0.3608,0.9542,0.9592,0.9592,0.9592,56.15,5.226

@@ -1,0 +1,5 @@
+blok,blok_sayisi_kare_basina,indirilen_blok_%,indirilen_alan_%,veri_azalmasi_alan_%,korunan_temiz_alan_%,kaybedilen_temiz_alan_%,bosuna_inen_bulut_alani_%,yuk_bayt,harita_bayt,toplam_bayt,bayt_referansa_gore,veri_azalmasi_bayt_%
+64x64,1,48.58,48.58,51.42,91.87,8.13,8.286,225893898,15360,225909258,1.0,52.5
+32x32,4,49.17,49.17,50.83,93.483,6.517,7.916,236471920,15360,236487280,1.0468,50.28
+16x16,16,49.82,49.82,50.18,94.904,5.096,7.854,254386107,30720,254416827,1.1262,46.51
+8x8,64,50.46,50.46,49.54,95.999,4.001,8.065,290161018,122880,290283898,1.285,38.97

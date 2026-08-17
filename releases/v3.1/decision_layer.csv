@@ -1,0 +1,6 @@
+,accuracy,precision,recall,f1,yanlis_eleme_%
+"1. bulut orani, sabit esik (%30)",0.9453,0.9528,0.9483,0.9505,5.84
+"2. bulut orani, val'de ayarli esik (0.643)",0.8927,0.9663,0.8355,0.8962,3.62
+3. esik BELIRSIZ bantta ayarli (0.288),0.9456,0.9515,0.9502,0.9509,6.02
+4. sekil oznitelikleri (lojistik regresyon),0.8924,0.9668,0.8346,0.8958,3.56
+5. yalnizca bulut orani (kontrol),0.8927,0.9663,0.8355,0.8962,3.62

@@ -1,0 +1,4 @@
+model,girdi,disk_MB,agirlik_MB,cikarim_ek_MB,tepe_bellek_MB,python_taban_MB
+v1/unet_int8,256x256,2.37,11.88,15.39,77.31,50.05
+v2/unet_int8,256x256,0.96,10.99,15.7,76.54,49.86
+v3/unet_int8,256x256,0.96,10.77,15.7,76.54,50.06

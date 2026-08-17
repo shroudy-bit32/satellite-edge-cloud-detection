@@ -1,0 +1,50 @@
+{
+  "model": "releases/v3.2/unet.pt",
+  "task": "segmentation",
+  "index": "data/patches_sparcs_t64/index.csv",
+  "threshold": 0.3,
+  "pixel_threshold": 0.5,
+  "overall": {
+    "n": 20480,
+    "accuracy": 0.923583984375,
+    "precision": 0.7711502307297898,
+    "recall": 0.9523005487547488,
+    "f1": 0.8522051185192181,
+    "roc_auc": 0.9732964793899349
+  },
+  "pixel": {
+    "iou": 0.722516870446036,
+    "dice": 0.8389083240258127,
+    "precision": 0.7689600791006356,
+    "recall": 0.9228556365744499,
+    "pixel_accuracy": 0.9311824202537525
+  },
+  "snowy": {
+    "n": 1364,
+    "accuracy": 0.9464809384164223,
+    "precision": 0.5897435897435898,
+    "recall": 0.9108910891089109,
+    "f1": 0.7159533073929961,
+    "roc_auc": 0.9466459710104027,
+    "kari_bulut_sanma_orani": 0.050673000791765635
+  },
+  "non_snowy": {
+    "n": 19116,
+    "accuracy": 0.921950198786357,
+    "precision": 0.7761194029850746,
+    "recall": 0.953202501617425,
+    "f1": 0.8555942702284166,
+    "roc_auc": 0.9736922017882182
+  },
+  "downlink": {
+    "test_goruntu_sayisi": 20480,
+    "gercek_bulutlu_orani_%": 23.13,
+    "elenen_goruntu_orani_%": 28.57,
+    "veri_indirme_azalmasi_%": 28.57,
+    "dogru_elenen_bulutlu": 4512,
+    "yanlis_elenen_kullanilabilir": 1339,
+    "kaybedilen_kullanilabilir_veri_%": 8.506,
+    "kacan_bulutlu_(bosuna_indirilen)": 226,
+    "teorik_ust_sinir_%": 23.13
+  }
+}

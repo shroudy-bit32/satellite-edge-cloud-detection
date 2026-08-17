@@ -4,9 +4,15 @@ Bu klasor stajin teslim edilecek ciktilarini icerir.
 
 | dosya | icerik |
 |---|---|
-| `TEKNIK_RAPOR.md` | 14 bolumluk teknik rapor: veri, yontem, sonuclar, fayda analizi, kuantizasyon calismasi, bellek profili, kisitlar, surum matrisi, literatur taramasi |
+| `TEKNIK_RAPOR.md` | Teknik rapor: veri, yontem, sonuclar, fayda analizi, harici dogrulama (siniflandirici + U-Net), kismi indirme odunlesimi, varyant karsilastirma matrisi, kuantizasyon calismasi, bellek profili, kisitlar, surum matrisi, literatur taramasi |
+| `TEKNIK_RAPOR.docx` | Ayni raporun Word surumu |
+| `PROJE_REHBERI.docx` | Proje rehberi |
 | `SUNUM.pptx` | 15 slaytlik sunum |
 | `demo_ornek.png` | Demo uygulamasinin ciktisi: RGB onizleme, Grad-CAM dikkat haritasi, U-Net bulut maskesi |
+
+> **Not:** `TEKNIK_RAPOR.docx` artik `.md` dosyasindan betikle uretilmektedir:
+> `python -m src.md_to_docx`. Rapor yeniden uretildiginde bu komutu da
+> calistirin; aksi halde `.docx` bayatlar.
 
 ## Nerede ne var
 
